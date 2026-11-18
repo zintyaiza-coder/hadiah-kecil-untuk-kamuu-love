@@ -1,100 +1,80 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kotak Kado & Taman Energi Semangat ✨</title>
-  <link rel="stylesheet" href="style.css">
-  <!-- Google Fonts Estetik -->
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,600&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
-  <!-- Three.js untuk Taman 3D -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magical Glowing Garden & Special Ending ✨🌸</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Playfair+Display:ital,wght@0,500;1,600&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Menu Pilihan Fitur di Atas -->
-  <div id="top-nav">
-    <button class="nav-btn active" onclick="switchTab('gift')">🎁 Kado Semangat</button>
-    <button class="nav-btn" onclick="switchTab('battery')">⚡ Baterai Energi</button>
-    <button class="nav-btn" onclick="switchTab('garden')">🌱 Taman Harapan</button>
-  </div>
+    <!-- Kanvas Partikel Cahaya & Kunang-kunang Real-time -->
+    <canvas id="canvas-partikel"></canvas>
 
-  <!-- ================= FITUR 1: KOTAK KADO GACHA SEMANGAT ================= -->
-  <div id="section-gift" class="app-section active">
-    <div class="gift-container">
-      <h1 class="section-title">✨ Kotak Kado Kejutan ✨</h1>
-      <p class="section-subtitle">Ketuk kado di bawah untuk membuka suntikan semangat hari ini!</p>
-      
-      <div id="gift-box" onclick="openGift()">
-        <div class="ribbon-vertical"></div>
-        <div class="ribbon-horizontal"></div>
-        <div class="gift-lid"></div>
-        <div class="gift-body">🎁</div>
-      </div>
+    <!-- Kabut Cahaya Latar Estetik -->
+    <div class="aurora-bg"></div>
+    <div class="efek-bintang-kilau"></div>
 
-      <div id="quote-card" class="hidden">
-        <p id="gacha-text">"Kamu hebat, jangan menyerah ya!"</p>
-        <button id="btn-another-gift" onclick="resetGift()">Buka Kado Lagi 💌</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= FITUR 2: MINI GAME BATERAI SEMANGAT ================= -->
-  <div id="section-battery" class="app-section">
-    <div class="battery-container">
-      <h1 class="section-title">⚡ Isi Baterai Semangatmu! ⚡</h1>
-      <p class="section-subtitle">Tap tombol di bawah secepat mungkin untuk mengisi energi positif!</p>
-      
-      <div class="battery-outer">
-        <div id="battery-fill"></div>
-        <span id="battery-text">10%</span>
-      </div>
-
-      <div id="energy-cheer">Ayo kumpulkan semangatmu! 💪</div>
-      
-      <button id="btn-tap-energy" onclick="boostEnergy()">🔥 TAP UNTUK ISI SEMANGAT! 🔥</button>
-    </div>
-  </div>
-
-  <!-- ================= FITUR 3: TAMAN HARAPAN DANDELION ================= -->
-  <div id="section-garden" class="app-section">
-    <!-- Kontrol Musik -->
-    <div id="audio-controls">
-      <button id="btn-audio" title="Putar / Jeda Musik">🔇 Musik</button>
-      <label for="upload-mp3" class="btn-upload" title="Pilih file MP3">📂 Pilih Lagu</label>
-      <input type="file" id="upload-mp3" accept="audio/*">
+    <!-- Lirik Sinematik (Fase 1) -->
+    <div id="lirik-container" class="tersembunyi">
+        <div class="bingkai-lirik">
+            <p id="teks-lirik"></p>
+        </div>
     </div>
 
-    <audio id="bg-music" loop preload="auto">
-      <source src="dandelions.mp3" type="audio/mpeg">
-    </audio>
+    <!-- Wadah Taman Bunga 3D CSS -->
+    <div id="taman-bunga"></div>
 
-    <div id="ui-container">
-      <div id="tap-hint">✨ Tap layar untuk menumbuhkan Dandelion ✨</div>
-      <div id="progress-wrapper">
-        <div id="progress-bar"></div>
-      </div>
+    <!-- Rumput Bercahaya di Bagian Bawah -->
+    <div id="rumput-container"></div>
+
+    <!-- LAYAR TEKA-TEKI AWAL -->
+    <div id="layar-tantangan" class="overlay">
+        <div class="kartu">
+            <div class="badge">✨ SECRET GARDEN ✨</div>
+            <h1>Kunci Taman Cahaya</h1>
+            <p class="deskripsi">Lengkapi potongan lirik ini untuk membangunkan bunga-bunga di kegelapan:</p>
+            <div class="kotak-soal">
+                "Sakit terasa berat-beratnya, ku tahu kau pun berjuang <span class="kosong">______</span>"
+            </div>
+            
+            <div class="pilihan-btn">
+                <button class="btn-pilihan" data-jawaban="salah">Sendiri 🌙</button>
+                <button class="btn-pilihan" data-jawaban="benar">Juga ✨</button>
+                <button class="btn-pilihan" data-jawaban="salah">Lelah 🌸</button>
+            </div>
+            <p id="pesan-salah" class="pesan-salah tersembunyi">Bukan itu... coba dengarkan lagi melodi di hatimu 🎶</p>
+        </div>
     </div>
 
-    <!-- Overlay Pesan Akhir Taman -->
-    <div id="quote-overlay" class="hidden">
-      <div class="quote-box">
-        <p class="glowing-text">
-          "Seperti bunga dandelion yang tumbuh sederhana di sudut taman,<br>
-          setiap harapan membutuhkan kesabaran untuk mekar.<br>
-          Dan ketika angin kehidupan datang menerbangkannya,<br>
-          jangan takut terlepas—sebab setiap benih yang terbang<br>
-          sedang mencari tempat baru untuk menumbuhkan keajaiban."
-        </p>
-        <span class="song-credit">♪ Kamu Layak Bahagia & Dihargai</span>
-        <button id="btn-replay" onclick="resetGarden()">🌱 Tanam Harapan Baru</button>
-      </div>
+    <!-- LAYAR ENDING / KEJUTAN (Fase 2 - Kolaborasi Proyek Kedua) -->
+    <div id="layar-ending" class="overlay tersembunyi">
+        <div class="kartu kartu-ending">
+            <div class="badge">💌 SPECIAL MESSAGE 💌</div>
+            <h1 class="judul-ending">Untuk Kamu yang Spesial</h1>
+            <div class="isi-pesan-ending">
+                <p>Terima kasih ya sudah mampir ke taman kecil ini. Walaupun perjalanan hari-hari terasa berat dan melelahkan, ingatlah kalau kamu tidak pernah benar-benar sendirian.</p>
+                <p>Semoga kombinasi bunga-bunga bercahaya dan alunan melodi ini bisa membawa ketenangan dan senyuman di hari kamu! ✨</p>
+                <p class="catatan-kecil">"You're doing great, and you are so appreciated." 🤍</p>
+            </div>
+            <div class="aksi-ending">
+                <button id="btn-kembali-taman" class="btn-pilihan">Kembali ke Taman 🌸</button>
+            </div>
+        </div>
     </div>
 
-    <!-- Kanvas 3D -->
-    <div id="canvas-container"></div>
-  </div>
+    <!-- Petunjuk & Tombol Navigasi Panel Atas -->
+    <div id="petunjuk" class="tersembunyi">Sentuh layar di mana saja untuk memanggil cahaya & bunga baru ✨</div>
+    <div class="panel-kontrol">
+        <button id="btn-ke-ending" class="btn-kontrol tersembunyi">Menuju Kejutan ➔</button>
+        <button id="btn-ulang" class="btn-kontrol tersembunyi">Ulangi ↻</button>
+    </div>
 
-  <script src="script.js"></script>
+    <!-- Audio 2 Lagu Berbeda -->
+    <audio id="lagu1" src="lagu1.mp3" loop></audio>
+    <audio id="lagu2" src="lagu2.mp3" loop></audio>
+
+    <script src="script.js"></script>
 </body>
 </html>
