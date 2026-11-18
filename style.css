@@ -1,5 +1,5 @@
 /* ==========================================================================
-   RESET & KONFIGURASI DASAR
+   RESET & PENGATURAN DASAR
    ========================================================================== */
 * {
     margin: 0;
@@ -21,12 +21,12 @@ body {
 }
 
 /* ==========================================================================
-   LATAR BELAKANG & PARTIKEL SEMESTA
+   LATAR BELAKANG MALAM & AURORA
    ========================================================================== */
 .langit-malam {
     position: fixed;
     inset: 0;
-    background: radial-gradient(ellipse at 50% 0%, #0f172a 0%, #020617 60%, #010205 100%);
+    background: radial-gradient(ellipse at 50% 0%, #0f172a 0%, #020617 65%, #010205 100%);
     z-index: 1;
 }
 
@@ -34,17 +34,16 @@ body {
     position: fixed;
     inset: 0;
     background: 
-        radial-gradient(circle at 20% 85%, rgba(20, 184, 166, 0.22) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(244, 114, 182, 0.18) 0%, transparent 50%),
-        radial-gradient(circle at 50% 40%, rgba(139, 92, 246, 0.12) 0%, transparent 60%);
+        radial-gradient(circle at 15% 80%, rgba(20, 184, 166, 0.2) 0%, transparent 50%),
+        radial-gradient(circle at 85% 75%, rgba(244, 114, 182, 0.15) 0%, transparent 50%);
     z-index: 2;
     pointer-events: none;
-    animation: napasAurora 10s infinite alternate ease-in-out;
+    animation: napasAurora 12s infinite alternate ease-in-out;
 }
 
 @keyframes napasAurora {
-    0% { opacity: 0.7; transform: scale(1); }
-    100% { opacity: 1; transform: scale(1.06); }
+    0% { opacity: 0.6; transform: scale(1); }
+    100% { opacity: 1; transform: scale(1.05); }
 }
 
 #canvas-semesta {
@@ -54,9 +53,6 @@ body {
     pointer-events: none;
 }
 
-/* ==========================================================================
-   SISTEM TRANSISI ANTAR BABAK
-   ========================================================================== */
 .layar-babak {
     position: fixed;
     inset: 0;
@@ -64,124 +60,102 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: opacity 1.1s cubic-bezier(0.22, 1, 0.36, 1), transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: opacity 1s cubic-bezier(0.22, 1, 0.36, 1), transform 1s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .layar-babak.tersembunyi {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transform: scale(1.06);
+    transform: scale(1.05);
 }
 
 /* ==========================================================================
-   BABAK 1: AMPLOP DIGITAL & SEGEL LILIN EMAS
+   BABAK 1: PEMBUKA AMPLOP KACA 3D (ANIMASI HIDUP)
    ========================================================================== */
-.wadah-amplop {
+.wadah-pembuka-animasi {
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-    animation: melayangHalus 4s infinite ease-in-out;
+    animation: melayangAsik 4s infinite ease-in-out;
 }
 
-@keyframes melayangHalus {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-14px); }
+@keyframes melayangAsik {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-12px) rotate(0.5deg); }
 }
 
 .cahaya-belakang-amplop {
     position: absolute;
-    width: 340px;
-    height: 220px;
-    background: radial-gradient(circle, rgba(94, 234, 212, 0.35), rgba(244, 114, 182, 0.2), transparent 70%);
-    filter: blur(30px);
+    width: 360px;
+    height: 240px;
+    background: radial-gradient(circle, rgba(94, 234, 212, 0.4), rgba(244, 114, 182, 0.25), transparent 70%);
+    filter: blur(35px);
     z-index: -1;
 }
 
-.amplop-fisik {
-    width: 320px;
-    height: 210px;
-    background: linear-gradient(145deg, rgba(30, 41, 59, 0.85), rgba(15, 23, 42, 0.95));
-    border: 1.5px solid rgba(94, 234, 212, 0.4);
-    border-radius: 20px;
-    position: relative;
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.85), inset 0 0 25px rgba(94, 234, 212, 0.15);
-    backdrop-filter: blur(12px);
-    overflow: hidden;
+.kartu-amplop-3d {
+    width: 340px;
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+    border: 1.5px solid rgba(94, 234, 212, 0.5);
+    border-radius: 28px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    box-shadow: 0 35px 70px rgba(0, 0, 0, 0.9), inset 0 0 30px rgba(94, 234, 212, 0.15);
+    backdrop-filter: blur(15px);
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
     align-items: center;
-    padding-bottom: 26px;
-    transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    gap: 1.2rem;
 }
 
-.tutup-amplop {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 115px;
-    background: linear-gradient(180deg, rgba(51, 65, 85, 0.9), rgba(30, 41, 59, 0.95));
-    clip-path: polygon(0 0, 100% 0, 50% 100%);
-    border-bottom: 1px solid rgba(94, 234, 212, 0.5);
-    transform-origin: top center;
-    transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
-    z-index: 2;
+.ikon-surat {
+    font-size: 2.8rem;
+    animation: denyutIkon 2s infinite alternate ease-in-out;
 }
 
-.amplop-terbuka .tutup-amplop {
-    transform: rotateX(180deg);
+@keyframes denyutIkon {
+    from { transform: scale(1); }
+    to { transform: scale(1.12); filter: drop-shadow(0 0 12px #5eead4); }
 }
 
-.label-amplop {
+.kartu-amplop-3d h2 {
     font-family: 'Cinzel', serif;
-    font-size: 1.05rem;
-    color: #f8fafc;
-    letter-spacing: 1px;
-    margin-bottom: 4px;
+    font-size: 1.3rem;
+    background: linear-gradient(to right, #fff, #5eead4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-.sub-amplop {
-    font-size: 0.8rem;
-    color: #5eead4;
-    opacity: 0.85;
+.kartu-amplop-3d p {
+    font-size: 0.92rem;
+    color: #94a3b8;
+    line-height: 1.5;
 }
 
-.segel-lilin {
-    position: absolute;
-    top: 82px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 58px;
-    height: 58px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #f43f5e, #be123c 65%, #881337);
-    border: 2px solid #fda4af;
-    box-shadow: 0 0 25px rgba(244, 63, 94, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.4);
-    color: #ffe4e6;
-    font-size: 1.4rem;
+.btn-buka-surat {
+    margin-top: 0.5rem;
+    background: linear-gradient(135deg, #14b8a6, #0d9488);
+    border: none;
+    color: #ffffff;
+    padding: 12px 28px;
+    border-radius: 50px;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
     cursor: pointer;
-    z-index: 5;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-    animation: denyutSegel 2s infinite alternate ease-in-out;
+    box-shadow: 0 8px 25px rgba(20, 184, 166, 0.5);
+    transition: all 0.3s ease;
 }
 
-@keyframes denyutSegel {
-    from { box-shadow: 0 0 18px rgba(244, 63, 94, 0.6); transform: translateX(-50%) scale(1); }
-    to { box-shadow: 0 0 35px rgba(244, 63, 94, 1), 0 0 50px rgba(253, 164, 175, 0.5); transform: translateX(-50%) scale(1.08); }
-}
-
-.segel-lilin:hover {
-    transform: translateX(-50%) scale(1.15) rotate(15deg);
+.btn-buka-surat:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 30px rgba(20, 184, 166, 0.8);
 }
 
 /* ==========================================================================
-   BABAK 2: 5 KARTU MOTIVASI SEMANGAT
+   BABAK 2: 5 KARTU MOTIVASI INTERAKTIF & ESTETIK
    ========================================================================== */
 .container-kartu-motivasi {
     width: 90%;
@@ -189,7 +163,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1.6rem;
 }
 
 .header-motivasi {
@@ -201,9 +175,9 @@ body {
 }
 
 .badge-babak {
-    font-size: 0.78rem;
+    font-size: 0.8rem;
     font-weight: 700;
-    letter-spacing: 3.5px;
+    letter-spacing: 3px;
     color: #5eead4;
     text-shadow: 0 0 12px rgba(94, 234, 212, 0.6);
 }
@@ -231,26 +205,26 @@ body {
     background: #f472b6;
 }
 
-.kartu-kaca {
+.kartu-kaca-animasi {
     width: 100%;
     background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
-    border: 1.5px solid rgba(94, 234, 212, 0.35);
-    border-radius: 32px;
-    padding: 2.8rem 2.2rem;
+    border: 1.5px solid rgba(94, 234, 212, 0.4);
+    border-radius: 35px;
+    padding: 3rem 2.4rem;
     text-align: center;
-    backdrop-filter: blur(18px);
-    box-shadow: 0 35px 75px rgba(0, 0, 0, 0.9), inset 0 0 30px rgba(94, 234, 212, 0.1);
-    transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.9), inset 0 0 35px rgba(94, 234, 212, 0.12);
+    transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .kartu-keluar {
     opacity: 0;
-    transform: translateX(-30px) scale(0.95);
+    transform: translateY(-25px) scale(0.95);
 }
 
 .kartu-masuk {
     opacity: 0;
-    transform: translateX(30px) scale(0.95);
+    transform: translateY(25px) scale(0.95);
 }
 
 .nomor-kutipan {
@@ -263,7 +237,7 @@ body {
 
 .judul-kutipan {
     font-family: 'Cinzel', serif;
-    font-size: 1.55rem;
+    font-size: 1.6rem;
     margin-bottom: 1.2rem;
     background: linear-gradient(to right, #ffffff, #5eead4);
     -webkit-background-clip: text;
@@ -273,16 +247,16 @@ body {
 .isi-kutipan {
     font-family: 'Playfair Display', serif;
     font-style: italic;
-    font-size: 1.15rem;
-    line-height: 1.75;
+    font-size: 1.18rem;
+    line-height: 1.8;
     color: #e2e8f0;
 }
 
 .hiasan-garis {
-    width: 60px;
+    width: 65px;
     height: 2px;
     background: linear-gradient(90deg, transparent, #5eead4, transparent);
-    margin: 1.6rem auto 0;
+    margin: 1.8rem auto 0;
 }
 
 .navigasi-motivasi {
@@ -291,7 +265,7 @@ body {
 }
 
 .btn-utama, .btn-spesial {
-    padding: 14px 32px;
+    padding: 14px 34px;
     border-radius: 50px;
     font-family: inherit;
     font-size: 1rem;
@@ -301,17 +275,17 @@ body {
 }
 
 .btn-utama {
-    background: rgba(94, 234, 212, 0.14);
+    background: rgba(94, 234, 212, 0.15);
     border: 1.5px solid #5eead4;
     color: #5eead4;
-    box-shadow: 0 0 20px rgba(94, 234, 212, 0.2);
+    box-shadow: 0 0 20px rgba(94, 234, 212, 0.25);
 }
 
 .btn-utama:hover {
     background: #5eead4;
     color: #020617;
-    transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 12px 30px rgba(94, 234, 212, 0.6);
+    transform: translateY(-4px) scale(1.06);
+    box-shadow: 0 12px 30px rgba(94, 234, 212, 0.65);
 }
 
 .btn-spesial {
@@ -328,19 +302,17 @@ body {
 }
 
 /* ==========================================================================
-   BABAK 3: ENDING TAMAN BUNGA 3D + SILUET ORANG BERAYUN
+   BABAK 3: PEMANDANGAN MALAM (GUNUNG, BULAN, AYUNAN DI SAMPING & BUNGA RENDAH)
    ========================================================================== */
 .bulan-purnama {
     position: fixed;
-    top: 12%;
-    right: 14%;
-    width: 120px;
-    height: 120px;
+    top: 10%;
+    right: 12%;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
     background: radial-gradient(circle at 35% 35%, #ffffff, #fef9c3 60%, #fde047);
-    box-shadow: 
-        0 0 40px 15px rgba(254, 240, 138, 0.45),
-        0 0 90px 40px rgba(94, 234, 212, 0.2);
+    box-shadow: 0 0 35px 12px rgba(254, 240, 138, 0.4), 0 0 80px 35px rgba(94, 234, 212, 0.18);
     z-index: 4;
     pointer-events: none;
 }
@@ -350,12 +322,56 @@ body {
     border-radius: 50%;
     background: rgba(202, 138, 4, 0.12);
 }
-.k1 { width: 24px; height: 24px; top: 28px; left: 32px; }
-.k2 { width: 16px; height: 16px; bottom: 30px; right: 28px; }
+.k1 { width: 20px; height: 20px; top: 22px; left: 26px; }
+.k2 { width: 14px; height: 14px; bottom: 24px; right: 22px; }
 
+/* Siluet Gunung */
+.pemandangan-gunung {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: 45vh;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.svg-gunung {
+    width: 100%;
+    height: 100%;
+}
+
+/* Panggung Ayunan di Samping */
+.panggung-ayunan-samping {
+    position: fixed;
+    top: 15%;
+    left: 6%;
+    width: 280px;
+    height: 280px;
+    z-index: 9;
+    pointer-events: none;
+}
+
+.svg-ayunan-samping {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.grup-ayunan {
+    transform-origin: 220px 90px;
+    animation: ayunanSamping 4.5s infinite ease-in-out;
+}
+
+@keyframes ayunanSamping {
+    0%, 100% { transform: rotate(-6deg); }
+    50% { transform: rotate(7deg); }
+}
+
+/* Lirik Bagian Atas */
 #lirik-container {
     position: fixed;
-    top: 10%;
+    top: 8%;
     left: 50%;
     transform: translateX(-50%);
     width: 92%;
@@ -368,8 +384,8 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 12px;
-    padding: 10px 26px;
-    background: rgba(2, 6, 23, 0.6);
+    padding: 9px 24px;
+    background: rgba(2, 6, 23, 0.65);
     backdrop-filter: blur(12px);
     border-radius: 40px;
     border: 1px solid rgba(94, 234, 212, 0.35);
@@ -378,13 +394,13 @@ body {
 
 .bintang-lirik {
     color: #5eead4;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 
 #teks-lirik {
     font-family: 'Playfair Display', serif;
     font-style: italic;
-    font-size: clamp(1.1rem, 3vw, 1.75rem);
+    font-size: clamp(1.05rem, 2.8vw, 1.65rem);
     color: #ffffff;
     text-shadow: 0 0 20px rgba(94, 234, 212, 0.9);
     transition: opacity 0.4s ease, transform 0.4s ease;
@@ -395,47 +411,7 @@ body {
     transform: translateY(10px);
 }
 
-.panggung-ayunan {
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: min(650px, 100vw);
-    height: 75vh;
-    z-index: 8;
-    pointer-events: none;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-}
-
-.svg-pohon-ayunan {
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-}
-
-.grup-ayunan {
-    transform-origin: 220px 145px;
-    animation: gerakAyunan 4.8s infinite ease-in-out;
-}
-
-@keyframes gerakAyunan {
-    0%, 100% { transform: rotate(-7deg); }
-    50% { transform: rotate(8deg); }
-}
-
-.lentera-gantung {
-    transform-origin: 120px 156px;
-    animation: goyangLentera 3.5s infinite alternate ease-in-out;
-}
-
-@keyframes goyangLentera {
-    from { transform: rotate(-5deg); }
-    to { transform: rotate(6deg); }
-}
-
-/* Taman Bunga 3D Neon */
+/* Taman Bunga Neon Rendah */
 #taman-bunga {
     position: fixed;
     inset: 0;
@@ -446,7 +422,7 @@ body {
 
 .bunga-wrapper {
     position: absolute;
-    bottom: -20px;
+    bottom: -15px;
     transform-origin: bottom center;
     transform: translateZ(var(--z-depth, 0px));
     animation: 
@@ -465,26 +441,26 @@ body {
 }
 
 .batang {
-    width: 6px;
-    height: var(--tinggi-batang, 180px);
+    width: 5.5px;
+    height: var(--tinggi-batang, 120px); /* Batang dibuat rendah agar pemandangan gunung & orang kelihatan */
     background: linear-gradient(to top, #01241f, #0d9488 50%, #5eead4);
-    border-radius: 12px;
+    border-radius: 10px;
     position: relative;
-    box-shadow: 0 0 16px rgba(45, 212, 191, 0.65);
+    box-shadow: 0 0 14px rgba(45, 212, 191, 0.6);
 }
 
 .daun {
     position: absolute;
-    width: 34px;
-    height: 16px;
+    width: 28px;
+    height: 14px;
     background: linear-gradient(135deg, #2dd4bf, #0f766e);
-    border-radius: 0 25px 0 25px;
+    border-radius: 0 20px 0 20px;
     transform: scale(0);
     animation: munculDaun 1s ease-out 0.8s forwards;
 }
 
-.daun.kiri { left: -32px; top: 44%; transform-origin: right center; }
-.daun.kanan { right: -32px; top: 60%; border-radius: 25px 0 25px 0; transform-origin: left center; }
+.daun.kiri { left: -26px; top: 44%; transform-origin: right center; }
+.daun.kanan { right: -26px; top: 60%; border-radius: 20px 0 20px 0; transform-origin: left center; }
 
 @keyframes munculDaun {
     to { transform: rotate(var(--rot-daun, -25deg)) scale(1); }
@@ -492,11 +468,11 @@ body {
 
 .mahkota-bunga {
     position: absolute;
-    top: -45px;
+    top: -38px;
     left: 50%;
     transform: translateX(-50%) scale(0);
-    width: 90px;
-    height: 90px;
+    width: 75px;
+    height: 75px;
     animation: mekarSempurna 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.9s forwards;
 }
 
@@ -509,17 +485,17 @@ body {
     position: absolute;
     bottom: 50%;
     left: 50%;
-    width: 28px;
-    height: 52px;
+    width: 24px;
+    height: 44px;
     border-radius: 50% 50% 50% 50% / 70% 70% 30% 30%;
     transform-origin: bottom center;
     opacity: 0.96;
 }
 
-.jenis-cyan .kelopak { background: linear-gradient(to top, #0f766e, #5eead4 75%, #ffffff); box-shadow: 0 0 22px rgba(94, 234, 212, 0.9); }
-.jenis-pink .kelopak { width: 34px; height: 48px; border-radius: 50% 50% 40% 40%; background: linear-gradient(to top, #9d174d, #f472b6 75%, #ffe4e6); box-shadow: 0 0 22px rgba(244, 114, 182, 0.9); }
-.jenis-ungu .kelopak { width: 24px; height: 56px; border-radius: 60% 60% 30% 30%; background: linear-gradient(to top, #5b21b6, #c084fc 75%, #f3e8ff); box-shadow: 0 0 22px rgba(192, 132, 252, 0.9); }
-.jenis-emas .kelopak { width: 26px; height: 52px; border-radius: 10% 90% 10% 90% / 50% 50% 50% 50%; background: linear-gradient(to top, #92400e, #fbbf24 75%, #fef9c3); box-shadow: 0 0 22px rgba(251, 191, 36, 0.9); }
+.jenis-cyan .kelopak { background: linear-gradient(to top, #0f766e, #5eead4 75%, #ffffff); box-shadow: 0 0 20px rgba(94, 234, 212, 0.9); }
+.jenis-pink .kelopak { width: 28px; height: 40px; border-radius: 50% 50% 40% 40%; background: linear-gradient(to top, #9d174d, #f472b6 75%, #ffe4e6); box-shadow: 0 0 20px rgba(244, 114, 182, 0.9); }
+.jenis-ungu .kelopak { width: 20px; height: 48px; border-radius: 60% 60% 30% 30%; background: linear-gradient(to top, #5b21b6, #c084fc 75%, #f3e8ff); box-shadow: 0 0 20px rgba(192, 132, 252, 0.9); }
+.jenis-emas .kelopak { width: 22px; height: 44px; border-radius: 10% 90% 10% 90% / 50% 50% 50% 50%; background: linear-gradient(to top, #92400e, #fbbf24 75%, #fef9c3); box-shadow: 0 0 20px rgba(251, 191, 36, 0.9); }
 
 .kelopak:nth-child(1) { transform: translateX(-50%) rotate(-52deg) scale(0.9); }
 .kelopak:nth-child(2) { transform: translateX(-50%) rotate(52deg) scale(0.9); }
@@ -532,14 +508,15 @@ body {
     top: 38%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 17px;
-    height: 17px;
+    width: 14px;
+    height: 14px;
     background: #ffffff;
     border-radius: 50%;
-    box-shadow: 0 0 16px 6px #fef08a, 0 0 32px 14px #5eead4;
+    box-shadow: 0 0 14px 5px #fef08a, 0 0 28px 12px #5eead4;
     z-index: 4;
 }
 
+/* Kunang-kunang Tambahan */
 .kupu-magis {
     position: absolute;
     z-index: 25;
@@ -555,11 +532,11 @@ body {
 }
 
 .sayap-kiri, .sayap-kanan {
-    width: 18px;
-    height: 24px;
+    width: 16px;
+    height: 20px;
     background: radial-gradient(circle, #ffffff 15%, var(--warna-kupu, #5eead4) 85%);
     border-radius: 80% 20% 60% 40%;
-    box-shadow: 0 0 16px var(--warna-kupu, #5eead4);
+    box-shadow: 0 0 14px var(--warna-kupu, #5eead4);
 }
 .sayap-kanan { transform: scaleX(-1); }
 
@@ -570,9 +547,9 @@ body {
 
 @keyframes terbangBebas {
     0% { transform: translate(0, 0) rotate(10deg); }
-    33% { transform: translate(100px, -80px) rotate(-16deg); }
-    66% { transform: translate(-90px, -130px) rotate(16deg); }
-    100% { transform: translate(110px, -45px) rotate(-10deg); }
+    33% { transform: translate(90px, -70px) rotate(-16deg); }
+    66% { transform: translate(-80px, -110px) rotate(16deg); }
+    100% { transform: translate(100px, -40px) rotate(-10deg); }
 }
 
 #rumput-container {
@@ -580,7 +557,7 @@ body {
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 85px;
+    height: 65px;
     z-index: 15;
     pointer-events: none;
 }
@@ -588,7 +565,7 @@ body {
 .helai-rumput {
     position: absolute;
     bottom: -5px;
-    width: 6px;
+    width: 5px;
     background: linear-gradient(to top, #01241f, #14b8a6);
     border-radius: 100% 0 0 0;
     transform-origin: bottom center;
@@ -607,7 +584,7 @@ body {
     transform: translateX(-50%);
     font-size: 0.85rem;
     color: rgba(94, 234, 212, 0.9);
-    background: rgba(2, 6, 23, 0.7);
+    background: rgba(2, 6, 23, 0.75);
     padding: 8px 20px;
     border-radius: 20px;
     border: 1px solid rgba(94, 234, 212, 0.3);
