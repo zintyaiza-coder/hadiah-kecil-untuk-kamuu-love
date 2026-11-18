@@ -47,23 +47,37 @@ let indeksMotivasi = 0;
 let modeEndingAktif = false;
 let modeInteraksiEnding = "bunga";
 let daftarBebanTerbang = [];
+let indeksLirikAktif = -1;
+let menggunakanMp3 = false;
+let timeoutTypewriter = null;
 
 let partikelArray = [];
 let bintangJatuhArray = [];
 let titikRasiBintang = [];
 
 /* ==========================================================================
-   SISTEM AUDIO AMBIENT OTOMATIS (WEB AUDIO API SYNTHESIZER)
+   JADWAL LIRIK ASLI DARI AUDIO (Hindia - Ramai Sepi Bersama)
+   Disesuaikan persis dengan ketukan potongan audio yang kamu berikan!
+   ========================================================================== */
+const jadwalLirikEnding = [
+    { detik: 0.0, teks: "Saat terasa berat-beratnya...", aksiBunga: true },
+    { detik: 4.5, teks: "Ku tahu kau pun berjuang juga 🌸", aksiBunga: true },
+    { detik: 9.0, teks: "Hadapi semuanya langsung di muka ✨", aksiBunga: true },
+    { detik: 14.0, teks: "Apapun yang terjadi di dunia 🤍", aksiBunga: true }
+];
+
+/* ==========================================================================
+   AUDIO UTAMA & FALLBACK SYNTH PIANO
    ========================================================================== */
 let audioCtx = null;
 let synthAktif = false;
 let intervalNada = null;
-let menggunakanMp3 = false;
 
-function mulaiAudioAmbient() {
+function mulaiMusimEnding() {
     btnAudioToggle.classList.remove('tersembunyi');
+    laguUtama.currentTime = 0;
+    laguUtama.volume = 0.95;
     
-    laguUtama.volume = 0.8;
     const playPromise = laguUtama.play();
     if (playPromise !== undefined) {
         playPromise.then(() => {
@@ -84,12 +98,11 @@ function aktifkanPianoSynth() {
     statusAudioTeks.innerText = "Ambient Piano";
 
     const frekuensiNada = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25];
-    
     intervalNada = setInterval(() => {
         if (!synthAktif || audioCtx.state === 'suspended') return;
         const freq = frekuensiNada[Math.floor(Math.random() * frekuensiNada.length)];
         mainkanDentinganLembut(freq);
-    }, 2200);
+    }, 2400);
 }
 
 function mainkanDentinganLembut(freq) {
@@ -102,14 +115,14 @@ function mainkanDentinganLembut(freq) {
     osc.frequency.setValueAtTime(freq, now);
 
     gain.gain.setValueAtTime(0.001, now);
-    gain.gain.exponentialRampToValueAtTime(0.06, now + 0.4);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 4.5);
+    gain.gain.exponentialRampToValueAtTime(0.05, now + 0.4);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 4);
 
     osc.connect(gain);
     gain.connect(audioCtx.destination);
 
     osc.start(now);
-    osc.stop(now + 4.6);
+    osc.stop(now + 4.1);
 }
 
 btnAudioToggle.addEventListener('click', () => {
@@ -133,7 +146,7 @@ btnAudioToggle.addEventListener('click', () => {
 });
 
 /* ==========================================================================
-   KANVAS SEMESTA: BINTANG, BINTANG JATUH, RASI BINTANG & RIAK
+   KANVAS SEMESTA
    ========================================================================== */
 function resizeCanvas() {
     canvas.width = window.innerWidth;
@@ -260,7 +273,7 @@ function ledakanCahaya(x, y, jumlah = 28) {
 }
 
 /* ==========================================================================
-   BABAK 1: EFEK 3D TILT AMPLOP & MASUK
+   BABAK 1: TILT & TRANSISI
    ========================================================================== */
 document.addEventListener('mousemove', (e) => {
     if (babakPembuka.classList.contains('tersembunyi')) return;
@@ -274,17 +287,15 @@ btnBukaSurat.addEventListener('click', (e) => {
     if (namaInput) namaPengguna = namaInput;
 
     ledakanCahaya(e.clientX, e.clientY, 40);
-    mulaiAudioAmbient();
-
     babakPembuka.classList.add('tersembunyi');
     setTimeout(() => {
         siapkanBabakMotivasi();
         babakMotivasi.classList.remove('tersembunyi');
-    }, 550);
+    }, 600);
 });
 
 /* ==========================================================================
-   BABAK 2: 5 KUTIPAN MOTIVASI ASLI + FITUR INTERAKTIF
+   BABAK 2: MOTIVASI DENGAN EFEK KETIK (TYPEWRITER)
    ========================================================================== */
 function getDaftarLangkah() {
     return [
@@ -298,7 +309,7 @@ function getDaftarLangkah() {
             nomor: "02 / 05",
             judul: "Istirahat Bukan Berarti Menyerah",
             isi: "\"Kalau dunia terasa terlalu bising dan berat, tarik napas pelan-pelan. Kamu berhak berhenti sejenak untuk menenangkan hati tanpa harus merasa bersalah.\"",
-            tipe: "napas" // Fitur pemandu napas interaktif
+            tipe: "napas"
         },
         {
             nomor: "03 / 05",
@@ -310,7 +321,7 @@ function getDaftarLangkah() {
             nomor: "04 / 05",
             judul: "Kamu Sangat Berharga",
             isi: "\"Jangan pernah meragukan nilai dirimu hanya karena satu hari yang buruk. Kehadiranmu membawa warna dan arti yang luar biasa bagi orang-orang di sekitarmu.\"",
-            tipe: "lentera" // Fitur tulis & terbangkan beban
+            tipe: "lentera"
         },
         {
             nomor: "05 / 05",
@@ -348,7 +359,18 @@ function tampilkanLangkah(idx, animasi = true) {
     const terapkanKonten = () => {
         nomorKutipan.innerText = data.nomor;
         judulKutipan.innerText = data.judul;
-        isiKutipan.innerText = data.isi;
+        
+        clearTimeout(timeoutTypewriter);
+        isiKutipan.innerText = "";
+        let i = 0;
+        function ketikTeks() {
+            if (i < data.isi.length) {
+                isiKutipan.innerText += data.isi.charAt(i);
+                i++;
+                timeoutTypewriter = setTimeout(ketikTeks, 18);
+            }
+        }
+        ketikTeks();
 
         fiturLentera.classList.toggle('tersembunyi', data.tipe !== 'lentera');
         fiturNapas.classList.toggle('tersembunyi', data.tipe !== 'napas');
@@ -369,7 +391,6 @@ function tampilkanLangkah(idx, animasi = true) {
     }, 320);
 }
 
-// Interaksi Lentera Beban
 btnTerbangkanLentera.addEventListener('click', (e) => {
     const teks = inputBeban.value.trim();
     if (!teks) {
@@ -378,12 +399,10 @@ btnTerbangkanLentera.addEventListener('click', (e) => {
     }
     daftarBebanTerbang.push(teks);
     ledakanCahaya(e.clientX, e.clientY, 30);
-    mainkanDentinganLembut(523.25);
     inputBeban.value = "";
     statusLentera.innerText = `"${teks}" telah diterbangkan ke langit malam 🏮✨`;
 });
 
-// Interaksi Pemandu Napas
 let sedangNapas = false;
 btnMulaiNapas.addEventListener('click', () => {
     if (sedangNapas) return;
@@ -392,18 +411,12 @@ btnMulaiNapas.addEventListener('click', () => {
 
     teksNapas.innerText = "Tarik Napas...";
     lingkaranNapas.classList.add('tarik');
-    mainkanDentinganLembut(329.63);
 
-    setTimeout(() => {
-        teksNapas.innerText = "Tahan...";
-    }, 4000);
-
+    setTimeout(() => { teksNapas.innerText = "Tahan..."; }, 4000);
     setTimeout(() => {
         teksNapas.innerText = "Hembuskan Pelan...";
         lingkaranNapas.classList.remove('tarik');
-        mainkanDentinganLembut(261.63);
     }, 8000);
-
     setTimeout(() => {
         teksNapas.innerText = "Tenang ✨";
         sedangNapas = false;
@@ -424,20 +437,26 @@ btnLanjutMotivasi.addEventListener('click', (e) => {
 });
 
 /* ==========================================================================
-   BABAK 3: DUNIA MALAM INTERAKTIF, BUNGA, RASI BINTANG & LENTERA
+   BABAK 3: TAMAN MALAM SPEKTAKULER & LIRIK LAGU SINKRON
    ========================================================================== */
 const daftarJenisBunga = ['jenis-cyan', 'jenis-pink', 'jenis-ungu', 'jenis-emas'];
-let intervalPesanEnding = null;
 
 btnMenujuEnding.addEventListener('click', (e) => {
-    ledakanCahaya(e.clientX, e.clientY, 50);
+    ledakanCahaya(e.clientX, e.clientY, 60);
     babakMotivasi.classList.add('tersembunyi');
 
     setTimeout(() => {
         modeEndingAktif = true;
+        indeksLirikAktif = -1;
         babakEnding.classList.remove('tersembunyi');
+        
+        mulaiMusimEnding();
         inisialisasiTamanMalam();
-    }, 600);
+        
+        for(let i=0; i<4; i++) {
+            setTimeout(() => bintangJatuhArray.push(new BintangJatuh()), i * 400);
+        }
+    }, 700);
 });
 
 function inisialisasiTamanMalam() {
@@ -445,7 +464,7 @@ function inisialisasiTamanMalam() {
     tamanBunga.innerHTML = '';
     titikRasiBintang = [];
 
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 14; i++) {
         const x = (window.innerWidth * 0.08) + Math.random() * (window.innerWidth * 0.84);
         tanamBungaMewah(x, 75 + Math.random() * 45, 0.8 + Math.random() * 0.35);
     }
@@ -454,26 +473,34 @@ function inisialisasiTamanMalam() {
     daftarBebanTerbang.forEach((teks, idx) => {
         setTimeout(() => luncurkanLentera(20 + idx * 18, teks), idx * 1800);
     });
+}
 
-    const pesanPuitis = [
-        `Selamat beristirahat sejenak, ${namaPengguna}... 🌙`,
-        "Klik langit untuk menggambar rasi bintangmu sendiri ✨",
-        "Setiap bunga yang tumbuh adalah doa baik untuk harimu 🌸",
-        "Kamu berhak merasa tenang dan bahagia malam ini 🤍"
-    ];
-    let idxPesan = 0;
-    teksLirik.innerText = pesanPuitis[0];
+laguUtama.addEventListener('timeupdate', () => {
+    if (!modeEndingAktif) return;
+    const waktuSekarang = laguUtama.currentTime;
 
-    clearInterval(intervalPesanEnding);
-    intervalPesanEnding = setInterval(() => {
-        if (!modeEndingAktif) return;
-        idxPesan = (idxPesan + 1) % pesanPuitis.length;
-        teksLirik.classList.add('lirik-transisi');
-        setTimeout(() => {
-            teksLirik.innerText = pesanPuitis[idxPesan];
-            teksLirik.classList.remove('lirik-transisi');
-        }, 350);
-    }, 5500);
+    for (let i = jadwalLirikEnding.length - 1; i >= 0; i--) {
+        if (waktuSekarang >= jadwalLirikEnding[i].detik) {
+            if (indeksLirikAktif !== i) {
+                indeksLirikAktif = i;
+                ubahLirikSinkron(jadwalLirikEnding[i].teks);
+
+                if (jadwalLirikEnding[i].aksiBunga) {
+                    const posX = (window.innerWidth * 0.1) + Math.random() * (window.innerWidth * 0.8);
+                    tanamBungaMewah(posX, 85 + Math.random() * 40, 0.8 + Math.random() * 0.3);
+                }
+            }
+            break;
+        }
+    }
+});
+
+function ubahLirikSinkron(teksBaru) {
+    teksLirik.classList.add('lirik-transisi');
+    setTimeout(() => {
+        teksLirik.innerText = teksBaru;
+        teksLirik.classList.remove('lirik-transisi');
+    }, 350);
 }
 
 function buatRumput() {
@@ -532,7 +559,6 @@ function luncurkanLentera(persenX, label = "") {
 bulanInteraktif.addEventListener('click', (e) => {
     e.stopPropagation();
     ledakanCahaya(e.clientX, e.clientY, 45);
-    mainkanDentinganLembut(659.25);
     for (let i = 0; i < 6; i++) {
         setTimeout(() => bintangJatuhArray.push(new BintangJatuh()), i * 250);
     }
@@ -553,7 +579,6 @@ document.addEventListener('click', (e) => {
     if (e.target.closest('button') || e.target.closest('.bulan-purnama')) return;
 
     ledakanCahaya(e.clientX, e.clientY, 22);
-    mainkanDentinganLembut(392.00 + Math.random() * 200);
 
     if (modeInteraksiEnding === 'bunga') {
         const tinggi = 70 + Math.random() * 55;
@@ -569,7 +594,10 @@ document.addEventListener('click', (e) => {
 
 btnUlangSemua.addEventListener('click', () => {
     modeEndingAktif = false;
-    clearInterval(intervalPesanEnding);
+    indeksLirikAktif = -1;
+    laguUtama.pause();
+    laguUtama.currentTime = 0;
+
     babakEnding.classList.add('tersembunyi');
     tamanBunga.innerHTML = '';
     langitLentera.innerHTML = '';
