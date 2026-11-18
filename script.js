@@ -1,6 +1,3 @@
-/* ==========================================================================
-   ELEMEN DOM & STATE GLOBAL
-   ========================================================================== */
 const canvas = document.getElementById('canvas-semesta');
 const ctx = canvas.getContext('2d');
 
@@ -44,21 +41,44 @@ const laguUtama = document.getElementById('lagu-utama');
 
 let namaPengguna = "Teman";
 let indeksMotivasi = 0;
-let modeEndingAktif = false;
 let modeInteraksiEnding = "bunga";
 let daftarBebanTerbang = [];
-let indeksLirikAktif = -1;
 let menggunakanMp3 = false;
 let timeoutTypewriter = null;
 
 let partikelArray = [];
 let bintangJatuhArray = [];
-let titikRasiBintang = [];
 
-/* ==========================================================================
-   JADWAL LIRIK ASLI DARI AUDIO (Hindia - Ramai Sepi Bersama)
-   Disesuaikan persis dengan ketukan potongan audio yang kamu berikan!
-   ========================================================================== */
+// Data Kartu Motivasi
+const daftarKutipan = [
+    {
+        judul: "Kamu Sudah Berjuang Hebat",
+        isi: "Hai {nama}, terima kasih karena sudah bertahan sampai detik ini. Tidak apa-apa jika hari ini melelahkan. Semesta tahu betapa besar usahamu.",
+        jenisFitur: "biasa"
+    },
+    {
+        judul: "Mari Lepaskan Bebanmu",
+        isi: "Apa satu hal yang paling membuat pundakmu berat hari ini? Tuliskan di bawah dan biarkan ia terbang menjadi lentera malam.",
+        jenisFitur: "lentera"
+    },
+    {
+        judul: "Waktunya Menarik Napas Dalam",
+        isi: "Dunia bisa menunggu sebentar, {nama}. Mari atur kembali detak jantungmu. Tarik napas perlahan dan lepaskan semua resah.",
+        jenisFitur: "napas"
+    },
+    {
+        judul: "Hadir Disini, Saat Ini",
+        isi: "Tidak perlu memikul semua beban masa depan malam ini. Pejamkan mata sejenak, rasakan hembusan angin malam yang memelukmu.",
+        jenisFitur: "biasa"
+    },
+    {
+        judul: "Tenang, Malam Menjagamu",
+        isi: "Kamu tidak pernah benar-benar sendiri. Di bawah langit yang sama, ada ketenangan yang menanti untuk menyambutmu beristirahat.",
+        jenisFitur: "terakhir"
+    }
+];
+
+// Jadwal lirik lagu
 const jadwalLirikEnding = [
     { detik: 0.0, teks: "Saat terasa berat-beratnya...", aksiBunga: true },
     { detik: 4.5, teks: "Ku tahu kau pun berjuang juga 🌸", aksiBunga: true },
@@ -66,466 +86,334 @@ const jadwalLirikEnding = [
     { detik: 14.0, teks: "Apapun yang terjadi di dunia 🤍", aksiBunga: true }
 ];
 
-/* ==========================================================================
-   AUDIO UTAMA & FALLBACK SYNTH PIANO
-   ========================================================================== */
-let audioCtx = null;
-let synthAktif = false;
-let intervalNada = null;
+// Inisialisasi Canvas Bintang
+function aturUkuranCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', aturUkuranCanvas);
+aturUkuranCanvas();
 
-function mulaiMusimEnding() {
-    btnAudioToggle.classList.remove('tersembunyi');
-    laguUtama.currentTime = 0;
-    laguUtama.volume = 0.95;
+for (let i = 0; i < 150; i++) {
+    partikelArray.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 1.8 + 0.5,
+        alpha: Math.random(),
+        kecepatanAlpha: (Math.random() * 0.02 + 0.005) * (Math.random() < 0.5 ? 1 : -1)
+    });
+}
+
+function animasikanCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    partikelArray.forEach(p => {
+        p.alpha += p.kecepatanAlpha;
+        if (p.alpha <= 0.1 || p.alpha >= 1) p.kecepatanAlpha *= -1;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
+        ctx.fill();
+    });
+
+    bintangJatuhArray.forEach((bj, index) => {
+        bj.x += bj.vx;
+        bj.y += bj.vy;
+        bj.jarakTempuh += Math.hypot(bj.vx, bj.vy);
+
+        ctx.beginPath();
+        ctx.moveTo(bj.x, bj.y);
+        ctx.lineTo(bj.x - bj.vx * 6, bj.y - bj.vy * 6);
+        ctx.strokeStyle = "rgba(153, 246, 228, 0.75)";
+        ctx.lineWidth = 1.8;
+        ctx.stroke();
+
+        if (bj.jarakTempuh > bj.panjangMaks || bj.y > canvas.height) {
+            bintangJatuhArray.splice(index, 1);
+        }
+    });
+
+    requestAnimationFrame(animasikanCanvas);
+}
+animasikanCanvas();
+
+function buatBintangJatuh(asalX = null, asalY = null) {
+    bintangJatuhArray.push({
+        x: asalX !== null ? asalX : Math.random() * canvas.width,
+        y: asalY !== null ? asalY : Math.random() * (canvas.height * 0.4),
+        vx: (Math.random() * 4 + 6) * (Math.random() < 0.5 ? 1 : -1),
+        vy: Math.random() * 3 + 3,
+        panjangMaks: Math.random() * 250 + 180,
+        jarakTempuh: 0
+    });
+}
+
+// Efek Tilt 3D Amplop
+document.addEventListener('mousemove', (e) => {
+    if (!babakPembuka.classList.contains('tersembunyi')) {
+        const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+        const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+        tiltContainer.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+    }
+});
+
+// Tombol Buka Surat
+btnBukaSurat.addEventListener('click', () => {
+    const val = inputNamaUser.value.trim();
+    if (val) namaPengguna = val;
     
-    const playPromise = laguUtama.play();
-    if (playPromise !== undefined) {
-        playPromise.then(() => {
-            menggunakanMp3 = true;
-            statusAudioTeks.innerText = "Musik Aktif";
-        }).catch(() => {
-            aktifkanPianoSynth();
-        });
-    } else {
-        aktifkanPianoSynth();
+    sapaanPersonal.innerText = `✨ UNTUK ${namaPengguna.toUpperCase()} MALAM INI ✨`;
+    
+    babakPembuka.classList.add('tersembunyi');
+    babakMotivasi.classList.remove('tersembunyi');
+    
+    inisialisasiProgresIndikator();
+    muatKartuMotivasi(0);
+});
+
+function inisialisasiProgresIndikator() {
+    indikatorProgres.innerHTML = '';
+    for (let i = 0; i < daftarKutipan.length; i++) {
+        const titik = document.createElement('div');
+        titik.classList.add('titik-progres');
+        if (i === 0) titik.classList.add('aktif');
+        indikatorProgres.appendChild(titik);
     }
 }
 
-function aktifkanPianoSynth() {
-    if (synthAktif) return;
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    synthAktif = true;
-    statusAudioTeks.innerText = "Ambient Piano";
-
-    const frekuensiNada = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25];
-    intervalNada = setInterval(() => {
-        if (!synthAktif || audioCtx.state === 'suspended') return;
-        const freq = frekuensiNada[Math.floor(Math.random() * frekuensiNada.length)];
-        mainkanDentinganLembut(freq);
-    }, 2400);
+function perbaruiProgresTitik() {
+    const semuaTitik = indikatorProgres.children;
+    for (let i = 0; i < semuaTitik.length; i++) {
+        semuaTitik[i].className = 'titik-progres';
+        if (i < indeksMotivasi) semuaTitik[i].classList.add('selesai');
+        else if (i === indeksMotivasi) semuaTitik[i].classList.add('aktif');
+    }
 }
 
-function mainkanDentinganLembut(freq) {
-    if (!audioCtx) return;
-    const now = audioCtx.currentTime;
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
+function muatKartuMotivasi(indeks) {
+    indeksMotivasi = indeks;
+    perbaruiProgresTitik();
 
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(freq, now);
+    kartuAktif.classList.add('kartu-keluar');
+    setTimeout(() => {
+        nomorKutipan.innerText = `0${indeks + 1} / 0${daftarKutipan.length}`;
+        judulKutipan.innerText = daftarKutipan[indeks].judul;
+        
+        const teksMentah = daftarKutipan[indeks].isi.replace(/{nama}/g, namaPengguna);
+        mulaiEfekKetik(teksMentah);
 
-    gain.gain.setValueAtTime(0.001, now);
-    gain.gain.exponentialRampToValueAtTime(0.05, now + 0.4);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 4);
+        fiturLentera.classList.add('tersembunyi');
+        fiturNapas.classList.add('tersembunyi');
 
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
+        if (daftarKutipan[indeks].jenisFitur === 'lentera') {
+            fiturLentera.classList.remove('tersembunyi');
+        } else if (daftarKutipan[indeks].jenisFitur === 'napas') {
+            fiturNapas.classList.remove('tersembunyi');
+        }
 
-    osc.start(now);
-    osc.stop(now + 4.1);
+        if (indeks === daftarKutipan.length - 1) {
+            btnLanjutMotivasi.classList.add('tersembunyi');
+            btnMenujuEnding.classList.remove('tersembunyi');
+        } else {
+            btnLanjutMotivasi.classList.remove('tersembunyi');
+            btnMenujuEnding.classList.add('tersembunyi');
+        }
+
+        kartuAktif.classList.remove('kartu-keluar');
+        kartuAktif.classList.add('kartu-masuk');
+        setTimeout(() => kartuAktif.classList.remove('kartu-masuk'), 400);
+    }, 300);
+}
+
+function mulaiEfekKetik(teks) {
+    if (timeoutTypewriter) clearTimeout(timeoutTypewriter);
+    isiKutipan.innerText = "";
+    let i = 0;
+    function ketik() {
+        if (i < teks.length) {
+            isiKutipan.innerText += teks.charAt(i);
+            i++;
+            timeoutTypewriter = setTimeout(ketik, 35);
+        }
+    }
+    ketik();
+}
+
+btnLanjutMotivasi.addEventListener('click', () => {
+    if (indeksMotivasi < daftarKutipan.length - 1) {
+        muatKartuMotivasi(indeksMotivasi + 1);
+    }
+});
+
+// Fitur Lentera Beban
+btnTerbangkanLentera.addEventListener('click', () => {
+    const beban = inputBeban.value.trim();
+    if (!beban) {
+        statusLentera.innerText = "Tuliskan dulu sebentar apa yang bikin capek...";
+        return;
+    }
+    daftarBebanTerbang.push(beban);
+    
+    const lentera = document.createElement('div');
+    lentera.classList.add('lentera-terbang');
+    lentera.style.left = `${Math.random() * (window.innerWidth - 100) + 50}px`;
+    lentera.innerHTML = `
+        <div class="badan-lentera"></div>
+        <div class="label-lentera">${beban}</div>
+    `;
+    langitLentera.appendChild(lentera);
+    setTimeout(() => lentera.remove(), 18000);
+
+    statusLentera.innerText = "Lenteramu berhasil diterbangkan ke angkasa ✨";
+    inputBeban.value = "";
+    setTimeout(() => { statusLentera.innerText = ""; }, 4000);
+});
+
+// Fitur Pernapasan 4-4-4
+btnMulaiNapas.addEventListener('click', () => {
+    btnMulaiNapas.disabled = true;
+    teksNapas.innerText = "Tarik Napas...";
+    lingkaranNapas.classList.add('tarik');
+
+    setTimeout(() => {
+        teksNapas.innerText = "Tahan...";
+    }, 4000);
+
+    setTimeout(() => {
+        teksNapas.innerText = "Hembuskan...";
+        lingkaranNapas.classList.remove('tarik');
+    }, 8000);
+
+    setTimeout(() => {
+        teksNapas.innerText = "Selesai 🤍";
+        btnMulaiNapas.disabled = false;
+    }, 12000);
+});
+
+// Tombol Menuju Babak Ending (Taman Malam)
+btnMenujuEnding.addEventListener('click', () => {
+    babakMotivasi.classList.add('tersembunyi');
+    babakEnding.classList.remove('tersembunyi');
+    btnUlangSemua.classList.remove('tersembunyi');
+    
+    mulaiMusikEnding();
+    inisialisasiTamanBunga();
+    mulaiSinkronisasiLirik();
+});
+
+// Audio Handler
+function mulaiMusikEnding() {
+    btnAudioToggle.classList.remove('tersembunyi');
+    laguUtama.currentTime = 0;
+    laguUtama.volume = 0.9;
+    
+    laguUtama.play().then(() => {
+        menggunakanMp3 = true;
+        statusAudioTeks.innerText = "Musik Aktif";
+    }).catch(() => {
+        aktifkanPianoFallback();
+    });
+}
+
+function aktifkanPianoFallback() {
+    statusAudioTeks.innerText = "Ambient Synth";
+    try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        setInterval(() => {
+            if (audioCtx.state === 'suspended') return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const frekuensi = [261.63, 329.63, 392.00, 523.25][Math.floor(Math.random() * 4)];
+            osc.frequency.setValueAtTime(frekuensi, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 3);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 3);
+        }, 3000);
+    } catch(e) {}
 }
 
 btnAudioToggle.addEventListener('click', () => {
     if (menggunakanMp3) {
         if (laguUtama.paused) {
             laguUtama.play();
-            statusAudioTeks.innerText = "Musik Aktif";
+            statusAudioTeks.innerText = "Musik Nyala";
         } else {
             laguUtama.pause();
-            statusAudioTeks.innerText = "Mati";
-        }
-    } else if (audioCtx) {
-        if (audioCtx.state === 'running') {
-            audioCtx.suspend();
-            statusAudioTeks.innerText = "Mati";
-        } else {
-            audioCtx.resume();
-            statusAudioTeks.innerText = "Ambient Piano";
+            statusAudioTeks.innerText = "Musik Diam";
         }
     }
 });
 
-/* ==========================================================================
-   KANVAS SEMESTA
-   ========================================================================== */
-function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-}
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
-
-class Partikel {
-    constructor(x, y, ledakan = false) {
-        this.x = x || Math.random() * canvas.width;
-        this.y = y || Math.random() * canvas.height;
-        this.size = ledakan ? Math.random() * 4 + 1.5 : Math.random() * 2.4 + 0.6;
-        this.speedY = ledakan ? (Math.random() - 0.5) * 6.5 : -(Math.random() * 0.6 + 0.15);
-        this.speedX = (Math.random() - 0.5) * (ledakan ? 6.5 : 0.5);
-        this.opacity = Math.random() * 0.8 + 0.2;
-        this.fade = ledakan ? 0.016 : 0.002;
-        this.ledakan = ledakan;
-        const warna = ['#5eead4', '#fef08a', '#f472b6', '#c084fc', '#ffffff'];
-        this.color = warna[Math.floor(Math.random() * warna.length)];
-    }
-    update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        if (this.ledakan) this.opacity -= this.fade;
-        else {
-            if (this.y < -10) this.y = canvas.height + 10;
-            if (this.x < -10) this.x = canvas.width + 10;
-            if (this.x > canvas.width + 10) this.x = -10;
-        }
-    }
-    draw() {
-        if (this.opacity <= 0) return;
-        ctx.save();
-        ctx.globalAlpha = this.opacity;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.shadowBlur = 14;
-        ctx.shadowColor = this.color;
-        ctx.fill();
-        ctx.restore();
-    }
-}
-
-class BintangJatuh {
-    constructor() {
-        this.x = Math.random() * canvas.width * 0.8;
-        this.y = Math.random() * canvas.height * 0.3;
-        this.len = 90 + Math.random() * 70;
-        this.speed = 11 + Math.random() * 6;
-        this.opacity = 1;
-    }
-    update() {
-        this.x += this.speed;
-        this.y += this.speed * 0.55;
-        this.opacity -= 0.018;
-    }
-    draw() {
-        if (this.opacity <= 0) return;
-        ctx.save();
-        const grad = ctx.createLinearGradient(this.x, this.y, this.x - this.len, this.y - this.len * 0.55);
-        grad.addColorStop(0, `rgba(255, 255, 255, ${this.opacity})`);
-        grad.addColorStop(1, 'rgba(94, 234, 212, 0)');
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(this.x, this.y);
-        ctx.lineTo(this.x - this.len, this.y - this.len * 0.55);
-        ctx.stroke();
-        ctx.restore();
-    }
-}
-
-for (let i = 0; i < 120; i++) partikelArray.push(new Partikel());
-
-setInterval(() => {
-    if (Math.random() > 0.35) bintangJatuhArray.push(new BintangJatuh());
-}, 3200);
-
-function animasiCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    for (let i = partikelArray.length - 1; i >= 0; i--) {
-        partikelArray[i].update();
-        partikelArray[i].draw();
-        if (partikelArray[i].ledakan && partikelArray[i].opacity <= 0) partikelArray.splice(i, 1);
-    }
-
-    for (let i = bintangJatuhArray.length - 1; i >= 0; i--) {
-        bintangJatuhArray[i].update();
-        bintangJatuhArray[i].draw();
-        if (bintangJatuhArray[i].opacity <= 0) bintangJatuhArray.splice(i, 1);
-    }
-
-    if (titikRasiBintang.length > 0) {
-        ctx.save();
-        ctx.strokeStyle = 'rgba(94, 234, 212, 0.55)';
-        ctx.lineWidth = 1.5;
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = '#5eead4';
-        ctx.beginPath();
-        titikRasiBintang.forEach((pt, index) => {
-            if (index === 0) ctx.moveTo(pt.x, pt.y);
-            else ctx.lineTo(pt.x, pt.y);
-        });
-        ctx.stroke();
-
-        titikRasiBintang.forEach((pt) => {
-            ctx.beginPath();
-            ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
-            ctx.fillStyle = '#ffffff';
-            ctx.fill();
-        });
-        ctx.restore();
-    }
-
-    requestAnimationFrame(animasiCanvas);
-}
-animasiCanvas();
-
-function ledakanCahaya(x, y, jumlah = 28) {
-    for (let i = 0; i < jumlah; i++) partikelArray.push(new Partikel(x, y, true));
-}
-
-/* ==========================================================================
-   BABAK 1: TILT & TRANSISI
-   ========================================================================== */
-document.addEventListener('mousemove', (e) => {
-    if (babakPembuka.classList.contains('tersembunyi')) return;
-    const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
-    const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
-    tiltContainer.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
-});
-
-btnBukaSurat.addEventListener('click', (e) => {
-    const namaInput = inputNamaUser.value.trim();
-    if (namaInput) namaPengguna = namaInput;
-
-    ledakanCahaya(e.clientX, e.clientY, 40);
-    babakPembuka.classList.add('tersembunyi');
-    setTimeout(() => {
-        siapkanBabakMotivasi();
-        babakMotivasi.classList.remove('tersembunyi');
-    }, 600);
-});
-
-/* ==========================================================================
-   BABAK 2: MOTIVASI DENGAN EFEK KETIK (TYPEWRITER)
-   ========================================================================== */
-function getDaftarLangkah() {
-    return [
-        {
-            nomor: "01 / 05",
-            judul: "Kamu Sudah Berjuang Hebat",
-            isi: `"Sakit dan lelah yang kamu rasakan hari ini bukan tanda kamu lemah ${namaPengguna}, tapi bukti bahwa kamu sedang melangkah melewati batas yang dulu kamu kira mustahil."`,
-            tipe: "teks"
-        },
-        {
-            nomor: "02 / 05",
-            judul: "Istirahat Bukan Berarti Menyerah",
-            isi: "\"Kalau dunia terasa terlalu bising dan berat, tarik napas pelan-pelan. Kamu berhak berhenti sejenak untuk menenangkan hati tanpa harus merasa bersalah.\"",
-            tipe: "napas"
-        },
-        {
-            nomor: "03 / 05",
-            judul: "Bunga pun Butuh Malam untuk Mekar",
-            isi: "\"Tidak apa-apa jika hari ini langkahmu terasa lambat. Setiap proses butuh waktu, dan percayalah, versi terbaik dirimu sedang tumbuh perlahan di balik setiap ujian.\"",
-            tipe: "teks"
-        },
-        {
-            nomor: "04 / 05",
-            judul: "Kamu Sangat Berharga",
-            isi: "\"Jangan pernah meragukan nilai dirimu hanya karena satu hari yang buruk. Kehadiranmu membawa warna dan arti yang luar biasa bagi orang-orang di sekitarmu.\"",
-            tipe: "lentera"
-        },
-        {
-            nomor: "05 / 05",
-            judul: "Menuju Ketenangan Malam",
-            isi: `"Terima kasih sudah bertahan sejauh ini ${namaPengguna}. Sekarang, tutup sejenak semua beban pikiranmu, dan rasakan hembusan angin malam serta alunan melodi di ruang tenang ini... ✨"`,
-            tipe: "teks"
-        }
-    ];
-}
-
-function siapkanBabakMotivasi() {
-    indeksMotivasi = 0;
-    sapaanPersonal.innerText = `✨ UNTUK ${namaPengguna.toUpperCase()} MALAM INI ✨`;
-    renderProgres();
-    tampilkanLangkah(0, false);
-    btnLanjutMotivasi.classList.remove('tersembunyi');
-    btnMenujuEnding.classList.add('tersembunyi');
-}
-
-function renderProgres() {
-    indikatorProgres.innerHTML = '';
-    for (let i = 0; i < 5; i++) {
-        const dot = document.createElement('div');
-        dot.classList.add('titik-progres');
-        if (i === indeksMotivasi) dot.classList.add('aktif');
-        else if (i < indeksMotivasi) dot.classList.add('selesai');
-        indikatorProgres.appendChild(dot);
-    }
-}
-
-function tampilkanLangkah(idx, animasi = true) {
-    const daftar = getDaftarLangkah();
-    const data = daftar[idx];
-
-    const terapkanKonten = () => {
-        nomorKutipan.innerText = data.nomor;
-        judulKutipan.innerText = data.judul;
-        
-        clearTimeout(timeoutTypewriter);
-        isiKutipan.innerText = "";
-        let i = 0;
-        function ketikTeks() {
-            if (i < data.isi.length) {
-                isiKutipan.innerText += data.isi.charAt(i);
-                i++;
-                timeoutTypewriter = setTimeout(ketikTeks, 18);
-            }
-        }
-        ketikTeks();
-
-        fiturLentera.classList.toggle('tersembunyi', data.tipe !== 'lentera');
-        fiturNapas.classList.toggle('tersembunyi', data.tipe !== 'napas');
-        renderProgres();
-    };
-
-    if (!animasi) {
-        terapkanKonten();
-        return;
-    }
-
-    kartuAktif.classList.add('kartu-keluar');
-    setTimeout(() => {
-        terapkanKonten();
-        kartuAktif.classList.remove('kartu-keluar');
-        kartuAktif.classList.add('kartu-masuk');
-        requestAnimationFrame(() => kartuAktif.classList.remove('kartu-masuk'));
-    }, 320);
-}
-
-btnTerbangkanLentera.addEventListener('click', (e) => {
-    const teks = inputBeban.value.trim();
-    if (!teks) {
-        statusLentera.innerText = "Tulis sedikit saja keluh kesahmu dulu ya ✨";
-        return;
-    }
-    daftarBebanTerbang.push(teks);
-    ledakanCahaya(e.clientX, e.clientY, 30);
-    inputBeban.value = "";
-    statusLentera.innerText = `"${teks}" telah diterbangkan ke langit malam 🏮✨`;
-});
-
-let sedangNapas = false;
-btnMulaiNapas.addEventListener('click', () => {
-    if (sedangNapas) return;
-    sedangNapas = true;
-    btnMulaiNapas.style.opacity = '0.5';
-
-    teksNapas.innerText = "Tarik Napas...";
-    lingkaranNapas.classList.add('tarik');
-
-    setTimeout(() => { teksNapas.innerText = "Tahan..."; }, 4000);
-    setTimeout(() => {
-        teksNapas.innerText = "Hembuskan Pelan...";
-        lingkaranNapas.classList.remove('tarik');
-    }, 8000);
-    setTimeout(() => {
-        teksNapas.innerText = "Tenang ✨";
-        sedangNapas = false;
-        btnMulaiNapas.style.opacity = '1';
-    }, 12500);
-});
-
-btnLanjutMotivasi.addEventListener('click', (e) => {
-    ledakanCahaya(e.clientX, e.clientY, 20);
-    if (indeksMotivasi < 4) {
-        indeksMotivasi++;
-        tampilkanLangkah(indeksMotivasi, true);
-        if (indeksMotivasi === 4) {
-            btnLanjutMotivasi.classList.add('tersembunyi');
-            btnMenujuEnding.classList.remove('tersembunyi');
-        }
-    }
-});
-
-/* ==========================================================================
-   BABAK 3: TAMAN MALAM SPEKTAKULER & LIRIK LAGU SINKRON
-   ========================================================================== */
-const daftarJenisBunga = ['jenis-cyan', 'jenis-pink', 'jenis-ungu', 'jenis-emas'];
-
-btnMenujuEnding.addEventListener('click', (e) => {
-    ledakanCahaya(e.clientX, e.clientY, 60);
-    babakMotivasi.classList.add('tersembunyi');
-
-    setTimeout(() => {
-        modeEndingAktif = true;
-        indeksLirikAktif = -1;
-        babakEnding.classList.remove('tersembunyi');
-        
-        mulaiMusimEnding();
-        inisialisasiTamanMalam();
-        
-        for(let i=0; i<4; i++) {
-            setTimeout(() => bintangJatuhArray.push(new BintangJatuh()), i * 400);
-        }
-    }, 700);
-});
-
-function inisialisasiTamanMalam() {
-    buatRumput();
-    tamanBunga.innerHTML = '';
-    titikRasiBintang = [];
-
-    for (let i = 0; i < 14; i++) {
-        const x = (window.innerWidth * 0.08) + Math.random() * (window.innerWidth * 0.84);
-        tanamBungaMewah(x, 75 + Math.random() * 45, 0.8 + Math.random() * 0.35);
-    }
-
-    if (daftarBebanTerbang.length === 0) daftarBebanTerbang.push(`Harapan Baik ${namaPengguna}`);
-    daftarBebanTerbang.forEach((teks, idx) => {
-        setTimeout(() => luncurkanLentera(20 + idx * 18, teks), idx * 1800);
-    });
-}
-
-laguUtama.addEventListener('timeupdate', () => {
-    if (!modeEndingAktif) return;
-    const waktuSekarang = laguUtama.currentTime;
-
-    for (let i = jadwalLirikEnding.length - 1; i >= 0; i--) {
-        if (waktuSekarang >= jadwalLirikEnding[i].detik) {
-            if (indeksLirikAktif !== i) {
-                indeksLirikAktif = i;
-                ubahLirikSinkron(jadwalLirikEnding[i].teks);
-
-                if (jadwalLirikEnding[i].aksiBunga) {
-                    const posX = (window.innerWidth * 0.1) + Math.random() * (window.innerWidth * 0.8);
-                    tanamBungaMewah(posX, 85 + Math.random() * 40, 0.8 + Math.random() * 0.3);
-                }
-            }
-            break;
-        }
-    }
-});
-
-function ubahLirikSinkron(teksBaru) {
-    teksLirik.classList.add('lirik-transisi');
-    setTimeout(() => {
-        teksLirik.innerText = teksBaru;
-        teksLirik.classList.remove('lirik-transisi');
-    }, 350);
-}
-
-function buatRumput() {
+// Inisialisasi Rumput & Bunga di Babak 3
+function inisialisasiTamanBunga() {
     rumputContainer.innerHTML = '';
-    const jumlah = Math.floor(window.innerWidth / 12);
-    for (let i = 0; i < jumlah; i++) {
-        const r = document.createElement('div');
-        r.classList.add('helai-rumput');
-        r.style.left = (i * 12 + Math.random() * 6) + 'px';
-        r.style.height = (20 + Math.random() * 30) + 'px';
-        r.style.animationDelay = (Math.random() * 2) + 's';
-        rumputContainer.appendChild(r);
+    for (let i = 0; i < window.innerWidth / 12; i++) {
+        const helai = document.createElement('div');
+        helai.classList.add('helai-rumput');
+        helai.style.left = `${i * 12 + Math.random() * 6}px`;
+        helai.style.height = `${Math.random() * 24 + 20}px`;
+        helai.style.animationDuration = `${Math.random() * 2 + 2.5}s`;
+        helai.style.animationDelay = `${Math.random() * 2}s`;
+        rumputContainer.appendChild(helai);
     }
 }
 
-function tanamBungaMewah(x, tinggi, skala) {
-    const jenis = daftarJenisBunga[Math.floor(Math.random() * daftarJenisBunga.length)];
+// Sinkronisasi Lirik
+function mulaiSinkronisasiLirik() {
+    let waktuMulai = Date.now();
+    
+    function perbaruiLirik() {
+        if (babakEnding.classList.contains('tersembunyi')) return;
+        let detikBerjalan = (Date.now() - waktuMulai) / 1000;
+        if (detikBerjalan > 18) {
+            waktuMulai = Date.now();
+            detikBerjalan = 0;
+        }
+
+        let lirikAktifObj = jadwalLirikEnding[0];
+        for (let i = 0; i < jadwalLirikEnding.length; i++) {
+            if (detikBerjalan >= jadwalLirikEnding[i].detik) {
+                lirikAktifObj = jadwalLirikEnding[i];
+            }
+        }
+
+        if (teksLirik.innerText !== lirikAktifObj.teks) {
+            teksLirik.classList.add('lirik-transisi');
+            setTimeout(() => {
+                teksLirik.innerText = lirikAktifObj.teks;
+                teksLirik.classList.remove('lirik-transisi');
+            }, 350);
+
+            if (lirikAktifObj.aksiBunga) {
+                tanamBungaOtomatis();
+            }
+        }
+
+        requestAnimationFrame(perbaruiLirik);
+    }
+    perbaruiLirik();
+}
+
+function tanamBungaOtomatis() {
+    const posX = Math.random() * (window.innerWidth - 100) + 50;
+    buatObjekBunga(posX);
+}
+
+function buatObjekBunga(x) {
+    const jenisList = ['jenis-cyan', 'jenis-pink', 'jenis-ungu', 'jenis-emas'];
+    const jenisPilihan = jenisList[Math.floor(Math.random() * jenisList.length)];
+
     const wrapper = document.createElement('div');
-    wrapper.classList.add('bunga-wrapper', jenis);
-    wrapper.style.left = x + 'px';
-    wrapper.style.setProperty('--tinggi-batang', tinggi + 'px');
-    wrapper.style.setProperty('--skala', skala);
-    wrapper.style.setProperty('--durasi-angin', (4 + Math.random() * 2.5) + 's');
-    wrapper.style.setProperty('--sudut-awal', (-4 - Math.random() * 3) + 'deg');
-    wrapper.style.setProperty('--sudut-akhir', (4 + Math.random() * 3) + 'deg');
+    wrapper.classList.add('bunga-wrapper', jenisPilihan);
+    wrapper.style.left = `${x}px`;
+    wrapper.style.setProperty('--tinggi-batang', `${Math.random() * 40 + 70}px`);
+    wrapper.style.setProperty('--skala', `${Math.random() * 0.3 + 0.85}`);
+    wrapper.style.setProperty('--durasi-angin', `${Math.random() * 3 + 4}s`);
+    wrapper.style.setProperty('--sudut-awal', `${-Math.random() * 6 - 2}deg`);
+    wrapper.style.setProperty('--sudut-akhir', `${Math.random() * 6 + 2}deg`);
 
     wrapper.innerHTML = `
         <div class="batang">
@@ -542,69 +430,74 @@ function tanamBungaMewah(x, tinggi, skala) {
         </div>
     `;
     tamanBunga.appendChild(wrapper);
-}
 
-function luncurkanLentera(persenX, label = "") {
-    const lentera = document.createElement('div');
-    lentera.classList.add('lentera-terbang');
-    lentera.style.left = persenX + '%';
-    lentera.innerHTML = `
-        <div class="badan-lentera"></div>
-        ${label ? `<span class="label-lentera">${label}</span>` : ''}
-    `;
-    langitLentera.appendChild(lentera);
-    setTimeout(() => lentera.remove(), 18500);
-}
-
-bulanInteraktif.addEventListener('click', (e) => {
-    e.stopPropagation();
-    ledakanCahaya(e.clientX, e.clientY, 45);
-    for (let i = 0; i < 6; i++) {
-        setTimeout(() => bintangJatuhArray.push(new BintangJatuh()), i * 250);
+    if (tamanBunga.children.length > 50) {
+        tamanBunga.removeChild(tamanBunga.children[0]);
     }
-});
+}
 
-document.querySelectorAll('.btn-mode').forEach((btn) => {
+// Interaksi Toolbar Bawah
+const tombolModeList = document.querySelectorAll('.btn-mode');
+tombolModeList.forEach(btn => {
     btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        document.querySelectorAll('.btn-mode').forEach(b => b.classList.remove('aktif'));
-        btn.classList.add('aktif');
-        modeInteraksiEnding = btn.dataset.mode;
-        if (modeInteraksiEnding === 'bintang') titikRasiBintang = [];
+        tombolModeList.forEach(b => b.classList.remove('aktif'));
+        e.target.classList.add('aktif');
+        modeInteraksiEnding = e.target.getAttribute('data-mode');
     });
 });
 
-document.addEventListener('click', (e) => {
-    if (!modeEndingAktif) return;
-    if (e.target.closest('button') || e.target.closest('.bulan-purnama')) return;
+babakEnding.addEventListener('click', (e) => {
+    if (e.target.closest('.toolbar-interaksi') || e.target.closest('.bulan-purnama')) return;
 
-    ledakanCahaya(e.clientX, e.clientY, 22);
+    const rect = babakEnding.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
 
-    if (modeInteraksiEnding === 'bunga') {
-        const tinggi = 70 + Math.random() * 55;
-        tanamBungaMewah(e.clientX, tinggi, 0.75 + Math.random() * 0.4);
+    if (modeInteraksiEnding === 'bunga' && y > window.innerHeight * 0.5) {
+        buatObjekBunga(x);
     } else if (modeInteraksiEnding === 'bintang') {
-        titikRasiBintang.push({ x: e.clientX, y: e.clientY });
-        if (titikRasiBintang.length > 12) titikRasiBintang.shift();
-    } else if (modeInteraksiEnding === 'lentera') {
-        const persenX = (e.clientX / window.innerWidth) * 100;
-        luncurkanLentera(persenX, `Doa ${namaPengguna}`);
+        buatBintangJatuh(x, y);
+    } else if (modeInteraksiEnding === 'kunang') {
+        buatEfekKunang(x, y);
     }
 });
 
+function buatEfekKunang(x, y) {
+    for (let i = 0; i < 4; i++) {
+        const kunang = document.createElement('div');
+        kunang.style.position = 'absolute';
+        kunang.style.left = `${x}px`;
+        kunang.style.top = `${y}px`;
+        kunang.style.width = '6px';
+        kunang.style.height = '6px';
+        kunang.style.borderRadius = '50%';
+        kunang.style.background = '#fef08a';
+        kunang.style.boxShadow = '0 0 12px #fde047';
+        kunang.style.zIndex = '40';
+        kunang.style.pointerEvents = 'none';
+        kunang.style.transition = 'all 1.8s ease-out';
+
+        babakEnding.appendChild(kunang);
+
+        setTimeout(() => {
+            kunang.style.transform = `translate(${(Math.random() - 0.5) * 140}px, ${-Math.random() * 120 - 40}px) scale(0.3)`;
+            kunang.style.opacity = '0';
+        }, 50);
+
+        setTimeout(() => kunang.remove(), 1850);
+    }
+}
+
+// Klik Bulan = Hujan Bintang
+bulanInteraktif.addEventListener('click', () => {
+    for (let i = 0; i < 7; i++) {
+        setTimeout(() => {
+            buatBintangJatuh(Math.random() * canvas.width, Math.random() * (canvas.height * 0.3));
+        }, i * 200);
+    }
+});
+
+// Tombol Ulangi
 btnUlangSemua.addEventListener('click', () => {
-    modeEndingAktif = false;
-    indeksLirikAktif = -1;
-    laguUtama.pause();
-    laguUtama.currentTime = 0;
-
-    babakEnding.classList.add('tersembunyi');
-    tamanBunga.innerHTML = '';
-    langitLentera.innerHTML = '';
-    titikRasiBintang = [];
-    daftarBebanTerbang = [];
-
-    setTimeout(() => {
-        babakPembuka.classList.remove('tersembunyi');
-    }, 500);
+    location.reload();
 });
