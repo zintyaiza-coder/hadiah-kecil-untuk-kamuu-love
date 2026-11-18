@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Kotak Kado & Taman Energi Semangat ✨</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Google Fonts Estetik -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,600&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+  <!-- Three.js untuk Taman 3D -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+  <!-- Menu Pilihan Fitur di Atas -->
+  <div id="top-nav">
+    <button class="nav-btn active" onclick="switchTab('gift')">🎁 Kado Semangat</button>
+    <button class="nav-btn" onclick="switchTab('battery')">⚡ Baterai Energi</button>
+    <button class="nav-btn" onclick="switchTab('garden')">🌱 Taman Harapan</button>
+  </div>
+
+  <!-- ================= FITUR 1: KOTAK KADO GACHA SEMANGAT ================= -->
+  <div id="section-gift" class="app-section active">
+    <div class="gift-container">
+      <h1 class="section-title">✨ Kotak Kado Kejutan ✨</h1>
+      <p class="section-subtitle">Ketuk kado di bawah untuk membuka suntikan semangat hari ini!</p>
+      
+      <div id="gift-box" onclick="openGift()">
+        <div class="ribbon-vertical"></div>
+        <div class="ribbon-horizontal"></div>
+        <div class="gift-lid"></div>
+        <div class="gift-body">🎁</div>
+      </div>
+
+      <div id="quote-card" class="hidden">
+        <p id="gacha-text">"Kamu hebat, jangan menyerah ya!"</p>
+        <button id="btn-another-gift" onclick="resetGift()">Buka Kado Lagi 💌</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= FITUR 2: MINI GAME BATERAI SEMANGAT ================= -->
+  <div id="section-battery" class="app-section">
+    <div class="battery-container">
+      <h1 class="section-title">⚡ Isi Baterai Semangatmu! ⚡</h1>
+      <p class="section-subtitle">Tap tombol di bawah secepat mungkin untuk mengisi energi positif!</p>
+      
+      <div class="battery-outer">
+        <div id="battery-fill"></div>
+        <span id="battery-text">10%</span>
+      </div>
+
+      <div id="energy-cheer">Ayo kumpulkan semangatmu! 💪</div>
+      
+      <button id="btn-tap-energy" onclick="boostEnergy()">🔥 TAP UNTUK ISI SEMANGAT! 🔥</button>
+    </div>
+  </div>
+
+  <!-- ================= FITUR 3: TAMAN HARAPAN DANDELION ================= -->
+  <div id="section-garden" class="app-section">
+    <!-- Kontrol Musik -->
+    <div id="audio-controls">
+      <button id="btn-audio" title="Putar / Jeda Musik">🔇 Musik</button>
+      <label for="upload-mp3" class="btn-upload" title="Pilih file MP3">📂 Pilih Lagu</label>
+      <input type="file" id="upload-mp3" accept="audio/*">
+    </div>
+
+    <audio id="bg-music" loop preload="auto">
+      <source src="dandelions.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="ui-container">
+      <div id="tap-hint">✨ Tap layar untuk menumbuhkan Dandelion ✨</div>
+      <div id="progress-wrapper">
+        <div id="progress-bar"></div>
+      </div>
+    </div>
+
+    <!-- Overlay Pesan Akhir Taman -->
+    <div id="quote-overlay" class="hidden">
+      <div class="quote-box">
+        <p class="glowing-text">
+          "Seperti bunga dandelion yang tumbuh sederhana di sudut taman,<br>
+          setiap harapan membutuhkan kesabaran untuk mekar.<br>
+          Dan ketika angin kehidupan datang menerbangkannya,<br>
+          jangan takut terlepas—sebab setiap benih yang terbang<br>
+          sedang mencari tempat baru untuk menumbuhkan keajaiban."
+        </p>
+        <span class="song-credit">♪ Kamu Layak Bahagia & Dihargai</span>
+        <button id="btn-replay" onclick="resetGarden()">🌱 Tanam Harapan Baru</button>
+      </div>
+    </div>
+
+    <!-- Kanvas 3D -->
+    <div id="canvas-container"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
