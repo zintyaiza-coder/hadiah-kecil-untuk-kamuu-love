@@ -5,7 +5,750 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sanctuary Malam — Ramai Sepi Bersama ✨🌙</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ==========================================================================
+           RESET & PENGATURAN DASAR
+           ========================================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: #01030a;
+            font-family: 'Quicksand', sans-serif;
+            color: #f8fafc;
+            position: relative;
+            perspective: 1200px;
+        }
+
+        /* ==========================================================================
+           ATMOSFER LANGIT MALAM, AURORA & KABUT
+           ========================================================================== */
+        .langit-malam {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 0%, #111c3a 0%, #03081c 60%, #010208 100%);
+            z-index: 1;
+        }
+
+        .aurora-layer {
+            position: fixed;
+            inset: -15%;
+            background: 
+                radial-gradient(ellipse at 20% 30%, rgba(20, 184, 166, 0.22) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 25%, rgba(168, 85, 247, 0.18) 0%, transparent 55%),
+                radial-gradient(ellipse at 50% 70%, rgba(244, 114, 182, 0.15) 0%, transparent 50%);
+            z-index: 2;
+            pointer-events: none;
+            animation: gerakAurora 14s infinite alternate ease-in-out;
+        }
+
+        @keyframes gerakAurora {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 0.7; }
+            50% { transform: translate(-3%, 2%) scale(1.08) rotate(1deg); opacity: 1; }
+            100% { transform: translate(3%, -2%) scale(1.03) rotate(-1deg); opacity: 0.8; }
+        }
+
+        .kabut-malam {
+            position: fixed;
+            bottom: 10%;
+            left: 0;
+            width: 200%;
+            height: 160px;
+            background: linear-gradient(90deg, transparent, rgba(94, 234, 212, 0.07), rgba(168, 85, 247, 0.08), transparent);
+            filter: blur(30px);
+            z-index: 6;
+            pointer-events: none;
+            animation: arusKabut 25s linear infinite;
+        }
+
+        @keyframes arusKabut {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        #canvas-semesta {
+            position: fixed;
+            inset: 0;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        /* Transisi Sinematik Antar Babak */
+        .layar-babak {
+            position: fixed;
+            inset: 0;
+            z-index: 20;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1), transform 1.2s cubic-bezier(0.22, 1, 0.36, 1), filter 1.2s ease;
+        }
+
+        .layar-babak.tersembunyi {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: scale(1.18);
+            filter: blur(12px);
+        }
+
+        /* ==========================================================================
+           BABAK 1: AMPLOP 3D TILT & INPUT NAMA PENGGUNA
+           ========================================================================== */
+        .wadah-pembuka-animasi {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+            animation: melayangAmplop 4s infinite ease-in-out;
+        }
+
+        @keyframes melayangAmplop {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .cahaya-belakang-amplop {
+            position: absolute;
+            width: 420px;
+            height: 320px;
+            background: radial-gradient(circle, rgba(94, 234, 212, 0.4), rgba(168, 85, 247, 0.3), transparent 70%);
+            filter: blur(45px);
+            z-index: -1;
+        }
+
+        .kartu-amplop-3d {
+            width: 380px;
+            max-width: 90vw;
+            background: linear-gradient(145deg, rgba(23, 35, 61, 0.9), rgba(10, 17, 36, 0.96));
+            border: 1.5px solid rgba(94, 234, 212, 0.5);
+            border-radius: 32px;
+            padding: 2.8rem 2.4rem;
+            text-align: center;
+            box-shadow: 0 40px 90px rgba(0, 0, 0, 0.95), inset 0 0 40px rgba(94, 234, 212, 0.18);
+            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.1rem;
+        }
+
+        .segel-lilin {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #f472b6, #be185d);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.7rem;
+            box-shadow: 0 0 30px rgba(244, 114, 182, 0.8), inset 0 2px 8px rgba(255, 255, 255, 0.6);
+            animation: denyutIkon 2s infinite alternate ease-in-out;
+        }
+
+        @keyframes denyutIkon {
+            from { transform: scale(1); filter: drop-shadow(0 0 8px rgba(244,114,182,0.5)); }
+            to { transform: scale(1.12); filter: drop-shadow(0 0 16px rgba(244,114,182,0.9)); }
+        }
+
+        .subjudul-kecil {
+            font-size: 0.75rem;
+            letter-spacing: 4px;
+            color: #5eead4;
+            font-weight: 700;
+        }
+
+        .kartu-amplop-3d h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            background: linear-gradient(to right, #ffffff, #5eead4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .kartu-amplop-3d p {
+            font-size: 0.92rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        .grup-input-nama {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        #input-nama-user {
+            width: 100%;
+            padding: 13px 20px;
+            border-radius: 50px;
+            border: 1.5px solid rgba(94, 234, 212, 0.45);
+            background: rgba(2, 6, 23, 0.7);
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 1rem;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s ease;
+            user-select: text;
+        }
+
+        #input-nama-user:focus {
+            border-color: #5eead4;
+            box-shadow: 0 0 20px rgba(94, 234, 212, 0.5);
+        }
+
+        .btn-buka-surat {
+            margin-top: 0.8rem;
+            width: 100%;
+            background: linear-gradient(135deg, #14b8a6, #0ea5e9);
+            border: none;
+            color: #ffffff;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-family: inherit;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 12px 30px rgba(20, 184, 166, 0.6);
+            transition: all 0.3s ease;
+        }
+
+        .btn-buka-surat:hover {
+            transform: translateY(-4px) scale(1.04);
+            box-shadow: 0 16px 40px rgba(20, 184, 166, 0.9);
+        }
+
+        /* ==========================================================================
+           BABAK 2: KARTU MOTIVASI & FITUR INTERAKTIF
+           ========================================================================== */
+        .container-kartu-motivasi {
+            width: 92%;
+            max-width: 540px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .header-motivasi {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .badge-babak {
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 3.5px;
+            color: #5eead4;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(94,234,212,0.5);
+        }
+
+        .indikator-progres {
+            display: flex;
+            gap: 10px;
+        }
+
+        .titik-progres {
+            width: 28px;
+            height: 5px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.18);
+            transition: all 0.4s ease;
+        }
+
+        .titik-progres.aktif {
+            background: #5eead4;
+            box-shadow: 0 0 14px #5eead4;
+            width: 48px;
+        }
+
+        .titik-progres.selesai {
+            background: #f472b6;
+        }
+
+        .kartu-kaca-animasi {
+            width: 100%;
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.88), rgba(2, 6, 23, 0.94));
+            border: 1.5px solid rgba(94, 234, 212, 0.45);
+            border-radius: 35px;
+            padding: 2.8rem 2.4rem;
+            text-align: center;
+            backdrop-filter: blur(25px);
+            box-shadow: 0 45px 90px rgba(0, 0, 0, 0.95), inset 0 0 40px rgba(94, 234, 212, 0.12);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .kartu-keluar { opacity: 0; transform: translateY(-25px) scale(0.95); }
+        .kartu-masuk { opacity: 0; transform: translateY(25px) scale(0.95); }
+
+        .nomor-kutipan {
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            color: #f472b6;
+            letter-spacing: 3.5px;
+            margin-bottom: 0.8rem;
+        }
+
+        .judul-kutipan {
+            font-family: 'Cinzel', serif;
+            font-size: 1.6rem;
+            margin-bottom: 1.2rem;
+            background: linear-gradient(to right, #ffffff, #5eead4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .isi-kutipan {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.18rem;
+            line-height: 1.8;
+            color: #e2e8f0;
+            min-height: 95px;
+        }
+
+        .area-interaktif-kartu {
+            margin-top: 1.4rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .area-interaktif-kartu.tersembunyi { display: none; }
+
+        #input-beban {
+            width: 100%;
+            padding: 12px 18px;
+            border-radius: 18px;
+            border: 1.5px solid rgba(244, 114, 182, 0.5);
+            background: rgba(2, 6, 23, 0.8);
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.95rem;
+            text-align: center;
+            outline: none;
+            user-select: text;
+        }
+
+        .btn-sekunder {
+            background: rgba(244, 114, 182, 0.2);
+            border: 1.5px solid #f472b6;
+            color: #fbcfe8;
+            padding: 10px 22px;
+            border-radius: 50px;
+            font-family: inherit;
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-sekunder:hover {
+            background: #f472b6;
+            color: #020617;
+            box-shadow: 0 0 25px rgba(244, 114, 182, 0.7);
+            transform: translateY(-2px);
+        }
+
+        .teks-petunjuk-kecil {
+            font-size: 0.82rem;
+            color: #5eead4;
+            min-height: 20px;
+        }
+
+        .wadah-lingkaran-napas {
+            height: 130px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .lingkaran-napas {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(94, 234, 212, 0.45), rgba(14, 165, 233, 0.18));
+            border: 2px solid #5eead4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-align: center;
+            padding: 8px;
+            box-shadow: 0 0 30px rgba(94, 234, 212, 0.45);
+            transition: transform 4s ease-in-out, box-shadow 4s ease-in-out;
+        }
+
+        .lingkaran-napas.tarik {
+            transform: scale(1.5);
+            box-shadow: 0 0 55px rgba(94, 234, 212, 0.9);
+        }
+
+        .hiasan-garis {
+            width: 75px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #5eead4, transparent);
+            margin: 1.5rem auto 0;
+        }
+
+        .navigasi-motivasi { display: flex; gap: 14px; }
+
+        .btn-utama, .btn-spesial {
+            padding: 14px 34px;
+            border-radius: 50px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-utama {
+            background: rgba(94, 234, 212, 0.18);
+            border: 1.5px solid #5eead4;
+            color: #5eead4;
+        }
+
+        .btn-utama:hover {
+            background: #5eead4;
+            color: #020617;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(94, 234, 212, 0.7);
+        }
+
+        .btn-spesial {
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            border: none;
+            color: #ffffff;
+            box-shadow: 0 12px 35px rgba(236, 72, 153, 0.6);
+            animation: denyutTombolSpesial 2s infinite alternate;
+        }
+
+        @keyframes denyutTombolSpesial {
+            from { transform: scale(1); box-shadow: 0 10px 25px rgba(236,72,153,0.5); }
+            to { transform: scale(1.06); box-shadow: 0 16px 45px rgba(236,72,153,0.9); }
+        }
+
+        .tersembunyi { display: none !important; }
+
+        /* ==========================================================================
+           BABAK 3: TAMAN MALAM, BULAN & DANAU REFLEKSI
+           ========================================================================== */
+        .bulan-purnama {
+            position: fixed;
+            top: 9%;
+            right: 11%;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #ffffff, #fef9c3 60%, #fde047);
+            box-shadow: 0 0 45px 16px rgba(254, 240, 138, 0.5), 0 0 100px 45px rgba(94, 234, 212, 0.22);
+            z-index: 7;
+            cursor: pointer;
+            transition: transform 0.4s ease;
+        }
+
+        .bulan-purnama:hover { transform: scale(1.1); }
+
+        .kawah-bulan { position: absolute; border-radius: 50%; background: rgba(202, 138, 4, 0.15); }
+        .k1 { width: 22px; height: 22px; top: 20px; left: 26px; }
+        .k2 { width: 15px; height: 15px; bottom: 24px; right: 22px; }
+        .k3 { width: 11px; height: 11px; top: 54px; left: 34px; }
+
+        #langit-lentera {
+            position: fixed;
+            inset: 0;
+            z-index: 8;
+            pointer-events: none;
+        }
+
+        .pemandangan-gunung {
+            position: fixed;
+            bottom: 12%;
+            left: 0;
+            width: 100vw;
+            height: 40vh;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .svg-gunung { width: 100%; height: 100%; }
+
+        .danau-refleksi {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100vw;
+            height: 13%;
+            background: linear-gradient(to bottom, #02081c 0%, #051336 50%, #01040f 100%);
+            border-top: 1.5px solid rgba(94, 234, 212, 0.3);
+            z-index: 6;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .pantulan-bulan {
+            position: absolute;
+            top: 10%;
+            right: 13%;
+            width: 70px;
+            height: 80%;
+            background: radial-gradient(ellipse, rgba(254, 240, 138, 0.4), transparent 70%);
+            filter: blur(7px);
+            animation: riakAir 3.5s infinite alternate ease-in-out;
+        }
+
+        @keyframes riakAir {
+            0% { transform: scaleX(0.85) skewX(-5deg); opacity: 0.5; }
+            100% { transform: scaleX(1.25) skewX(5deg); opacity: 0.9; }
+        }
+
+        .panggung-ayunan-samping {
+            position: fixed;
+            top: 13%;
+            left: 4%;
+            width: 280px;
+            height: 280px;
+            z-index: 9;
+            pointer-events: none;
+        }
+
+        .svg-ayunan-samping { width: 100%; height: 100%; overflow: visible; }
+
+        .grup-ayunan {
+            transform-origin: 220px 90px;
+            animation: ayunanSamping 4.5s infinite ease-in-out;
+        }
+
+        @keyframes ayunanSamping {
+            0%, 100% { transform: rotate(-6deg); }
+            50% { transform: rotate(7deg); }
+        }
+
+        #lirik-container {
+            position: fixed;
+            top: 7%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            text-align: center;
+            z-index: 50;
+            pointer-events: none;
+        }
+
+        .bingkai-lirik {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 28px;
+            background: rgba(2, 6, 23, 0.75);
+            backdrop-filter: blur(14px);
+            border-radius: 40px;
+            border: 1.5px solid rgba(94, 234, 212, 0.45);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.8);
+        }
+
+        .bintang-lirik { color: #5eead4; font-size: 0.9rem; }
+
+        #teks-lirik {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: clamp(1.05rem, 2.8vw, 1.55rem);
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(94, 234, 212, 0.95);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .lirik-transisi { opacity: 0 !important; transform: translateY(10px); }
+
+        #taman-bunga {
+            position: fixed;
+            inset: 0;
+            z-index: 12;
+            pointer-events: none;
+        }
+
+        .bunga-wrapper {
+            position: absolute;
+            bottom: 11%;
+            transform-origin: bottom center;
+            animation: 
+                naikDariBawah 2s cubic-bezier(0.19, 1, 0.22, 1) forwards,
+                anginMalam var(--durasi-angin, 5s) 2s infinite ease-in-out;
+        }
+
+        @keyframes naikDariBawah {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(var(--skala, 1)); opacity: 1; }
+        }
+
+        @keyframes anginMalam {
+            0%, 100% { transform: scale(var(--skala, 1)) rotate(var(--sudut-awal, -4deg)); }
+            50% { transform: scale(var(--skala, 1)) rotate(var(--sudut-akhir, 4deg)); }
+        }
+
+        .batang {
+            position: relative;
+            width: 3.8px;
+            height: var(--tinggi-batang, 100px);
+            background: linear-gradient(to top, #064e3b, #10b981);
+            border-radius: 4px;
+        }
+
+        .daun {
+            position: absolute;
+            width: 16px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50% 50% 0 50%;
+        }
+        .daun.kiri { bottom: 32%; left: -14px; transform: rotate(-25deg); }
+        .daun.kanan { bottom: 52%; right: -14px; transform: scaleX(-1) rotate(-25deg); }
+
+        .mahkota-bunga {
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 36px;
+            height: 36px;
+        }
+
+        .kelopak {
+            position: absolute;
+            top: 2px;
+            left: 12px;
+            width: 13px;
+            height: 18px;
+            border-radius: 50% 50% 20% 20%;
+            transform-origin: bottom center;
+        }
+        .kelopak:nth-child(1) { transform: rotate(0deg); }
+        .kelopak:nth-child(2) { transform: rotate(72deg); }
+        .kelopak:nth-child(3) { transform: rotate(144deg); }
+        .kelopak:nth-child(4) { transform: rotate(216deg); }
+        .kelopak:nth-child(5) { transform: rotate(288deg); }
+
+        .jenis-cyan .kelopak { background: linear-gradient(to top, #0d9488, #99f6e4); box-shadow: 0 0 14px #5eead4; }
+        .jenis-pink .kelopak { background: linear-gradient(to top, #db2777, #fbcfe8); box-shadow: 0 0 14px #f472b6; }
+        .jenis-ungu .kelopak { background: linear-gradient(to top, #7e22ce, #e9d5ff); box-shadow: 0 0 14px #c084fc; }
+        .jenis-emas .kelopak { background: linear-gradient(to top, #ca8a04, #fef08a); box-shadow: 0 0 14px #fef08a; }
+
+        .inti-cahaya {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background: #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 0 14px #ffffff, 0 0 25px #5eead4;
+        }
+
+        #rumput-container {
+            position: fixed;
+            bottom: 12%;
+            left: 0;
+            width: 100vw;
+            height: 48px;
+            z-index: 13;
+            pointer-events: none;
+        }
+
+        .helai-rumput {
+            position: absolute;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to top, #022c22, #10b981);
+            border-radius: 3px 3px 0 0;
+            transform-origin: bottom center;
+            animation: goyangRumput 3s infinite alternate ease-in-out;
+        }
+
+        @keyframes goyangRumput {
+            0% { transform: rotate(-6deg); }
+            100% { transform: rotate(6deg); }
+        }
+
+        .toolbar-interaksi {
+            position: fixed;
+            bottom: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            background: rgba(2, 6, 23, 0.85);
+            padding: 8px;
+            border-radius: 50px;
+            border: 1.5px solid rgba(94, 234, 212, 0.4);
+            backdrop-filter: blur(15px);
+            z-index: 60;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.85);
+        }
+
+        .btn-mode {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            padding: 9px 18px;
+            border-radius: 40px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .btn-mode.aktif {
+            background: linear-gradient(135deg, #14b8a6, #0ea5e9);
+            color: #ffffff;
+            box-shadow: 0 6px 18px rgba(20, 184, 166, 0.6);
+        }
+
+        .btn-kontrol-mengambang, .btn-ulang-pojok {
+            position: fixed;
+            top: 22px;
+            background: rgba(15, 23, 42, 0.88);
+            border: 1.5px solid rgba(94, 234, 212, 0.45);
+            color: #5eead4;
+            padding: 9px 18px;
+            border-radius: 30px;
+            font-family: inherit;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            z-index: 70;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+        }
+
+        .btn-kontrol-mengambang { left: 22px; }
+        .btn-ulang-pojok { right: 22px; }
+
+        .btn-ulang-pojok:hover, .btn-kontrol-mengambang:hover {
+            background: #5eead4;
+            color: #020617;
+            transform: scale(1.05);
+        }
+    </style>
 </head>
 <body>
 
@@ -17,9 +760,19 @@
     <div class="aurora-layer"></div>
     <div class="kabut-malam"></div>
 
+    <!-- Audio Utama -->
+    <audio id="lagu-utama" preload="auto" loop>
+        <source src="ramai-sepi-bersama.mp3" type="audio/mpeg">
+    </audio>
+
     <!-- Tombol Kontrol Musik Mengambang di Pojok Kiri Atas -->
     <button id="btn-audio-toggle" class="btn-kontrol-mengambang tersembunyi" title="Kontrol Musik">
         🔊 <span id="status-audio-teks">Musik Menyala</span>
+    </button>
+
+    <!-- Tombol Ulangi di Pojok Kanan Atas saat di Babak Akhir -->
+    <button id="btn-ulang-semua" class="btn-ulang-pojok tersembunyi" title="Mulai dari awal">
+        ✨ Ulangi
     </button>
 
     <!-- =====================================================================
@@ -146,4 +899,536 @@
                 <g class="grup-ayunan">
                     <line x1="220" y1="72" x2="215" y2="245" stroke="#94a3b8" stroke-width="1.8" opacity="0.85" />
                     <line x1="250" y1="82" x2="245" y2="245" stroke="#94a3b8" stroke-width="1.8" opacity="0.85" />
-                    <rect x="208" y="245
+                    <rect x="208" y="245" width="54" height="9" rx="4.5" fill="#334155" stroke="#5eead4" stroke-width="0.8" />
+                </g>
+            </svg>
+        </div>
+
+        <!-- Taman Bunga Interaktif di Bagian Bawah -->
+        <div id="taman-bunga"></div>
+        <div id="rumput-container"></div>
+
+        <!-- Danau Refleksi Air di Paling Bawah -->
+        <div class="danau-refleksi">
+            <div class="pantulan-bulan"></div>
+        </div>
+
+        <!-- Toolbar Kontrol Interaksi di Bagian Bawah Layar -->
+        <div class="toolbar-interaksi">
+            <button class="btn-mode aktif" data-mode="bunga">Tanam Bunga 🌸</button>
+            <button class="btn-mode" data-mode="bintang">Bintang Jatuh 🌠</button>
+            <button class="btn-mode" data-mode="kunang">Kunang-Kunang ✨</button>
+        </div>
+    </section>
+
+    <!-- =====================================================================
+         SKRIP JAVASCRIPT UTUH & AMAN
+         ===================================================================== -->
+    <script>
+        const canvas = document.getElementById('canvas-semesta');
+        const ctx = canvas.getContext('2d');
+
+        const babakPembuka = document.getElementById('babak-pembuka');
+        const babakMotivasi = document.getElementById('babak-motivasi');
+        const babakEnding = document.getElementById('babak-ending');
+
+        const tiltContainer = document.getElementById('tilt-container');
+        const inputNamaUser = document.getElementById('input-nama-user');
+        const btnBukaSurat = document.getElementById('btn-buka-surat');
+
+        const sapaanPersonal = document.getElementById('sapaan-personal');
+        const indikatorProgres = document.getElementById('indikator-progres');
+        const kartuAktif = document.getElementById('kartu-aktif');
+        const nomorKutipan = document.getElementById('nomor-kutipan');
+        const judulKutipan = document.getElementById('judul-kutipan');
+        const isiKutipan = document.getElementById('isi-kutipan');
+
+        const fiturLentera = document.getElementById('fitur-lentera');
+        const inputBeban = document.getElementById('input-beban');
+        const btnTerbangkanLentera = document.getElementById('btn-terbangkan-lentera');
+        const statusLentera = document.getElementById('status-lentera');
+
+        const fiturNapas = document.getElementById('fitur-napas');
+        const lingkaranNapas = document.getElementById('lingkaran-napas');
+        const teksNapas = document.getElementById('teks-napas');
+        const btnMulaiNapas = document.getElementById('btn-mulai-napas');
+
+        const btnLanjutMotivasi = document.getElementById('btn-lanjut-motivasi');
+        const btnMenujuEnding = document.getElementById('btn-menuju-ending');
+
+        const tamanBunga = document.getElementById('taman-bunga');
+        const rumputContainer = document.getElementById('rumput-container');
+        const langitLentera = document.getElementById('langit-lentera');
+        const teksLirik = document.getElementById('teks-lirik');
+        const bulanInteraktif = document.getElementById('bulan-interaktif');
+        const btnUlangSemua = document.getElementById('btn-ulang-semua');
+        const btnAudioToggle = document.getElementById('btn-audio-toggle');
+        const statusAudioTeks = document.getElementById('status-audio-teks');
+        const laguUtama = document.getElementById('lagu-utama');
+
+        let namaPengguna = "Teman";
+        let indeksMotivasi = 0;
+        let modeInteraksiEnding = "bunga";
+        let daftarBebanTerbang = [];
+        let menggunakanMp3 = false;
+        let timeoutTypewriter = null;
+
+        let partikelArray = [];
+        let bintangJatuhArray = [];
+
+        // Data Kartu Motivasi
+        const daftarKutipan = [
+            {
+                judul: "Kamu Sudah Berjuang Hebat",
+                isi: "Hai {nama}, terima kasih karena sudah bertahan sampai detik ini. Tidak apa-apa jika hari ini melelahkan. Semesta tahu betapa besar usahamu.",
+                jenisFitur: "biasa"
+            },
+            {
+                judul: "Mari Lepaskan Bebanmu",
+                isi: "Apa satu hal yang paling membuat pundakmu berat hari ini? Tuliskan di bawah dan biarkan ia terbang menjadi lentera malam.",
+                jenisFitur: "lentera"
+            },
+            {
+                judul: "Waktunya Menarik Napas Dalam",
+                isi: "Dunia bisa menunggu sebentar, {nama}. Mari atur kembali detak jantungmu. Tarik napas perlahan dan lepaskan semua resah.",
+                jenisFitur: "napas"
+            },
+            {
+                judul: "Hadir Disini, Saat Ini",
+                isi: "Tidak perlu memikul semua beban masa depan malam ini. Pejamkan mata sejenak, rasakan hembusan angin malam yang memelukmu.",
+                jenisFitur: "biasa"
+            },
+            {
+                judul: "Tenang, Malam Menjagamu",
+                isi: "Kamu tidak pernah benar-benar sendiri. Di bawah langit yang sama, ada ketenangan yang menanti untuk menyambutmu beristirahat.",
+                jenisFitur: "terakhir"
+            }
+        ];
+
+        // Jadwal lirik lagu
+        const jadwalLirikEnding = [
+            { detik: 0.0, teks: "Saat terasa berat-beratnya...", aksiBunga: true },
+            { detik: 4.5, teks: "Ku tahu kau pun berjuang juga 🌸", aksiBunga: true },
+            { detik: 9.0, teks: "Hadapi semuanya langsung di muka ✨", aksiBunga: true },
+            { detik: 14.0, teks: "Apapun yang terjadi di dunia 🤍", aksiBunga: true }
+        ];
+
+        // Inisialisasi Canvas Bintang
+        function aturUkuranCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', aturUkuranCanvas);
+        aturUkuranCanvas();
+
+        for (let i = 0; i < 150; i++) {
+            partikelArray.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 1.8 + 0.5,
+                alpha: Math.random(),
+                kecepatanAlpha: (Math.random() * 0.02 + 0.005) * (Math.random() < 0.5 ? 1 : -1)
+            });
+        }
+
+        function animasikanCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            partikelArray.forEach(p => {
+                p.alpha += p.kecepatanAlpha;
+                if (p.alpha <= 0.1 || p.alpha >= 1) p.kecepatanAlpha *= -1;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
+                ctx.fill();
+            });
+
+            bintangJatuhArray.forEach((bj, index) => {
+                bj.x += bj.vx;
+                bj.y += bj.vy;
+                bj.jarakTempuh += Math.hypot(bj.vx, bj.vy);
+
+                ctx.beginPath();
+                ctx.moveTo(bj.x, bj.y);
+                ctx.lineTo(bj.x - bj.vx * 6, bj.y - bj.vy * 6);
+                ctx.strokeStyle = "rgba(153, 246, 228, 0.75)";
+                ctx.lineWidth = 1.8;
+                ctx.stroke();
+
+                if (bj.jarakTempuh > bj.panjangMaks || bj.y > canvas.height) {
+                    bintangJatuhArray.splice(index, 1);
+                }
+            });
+
+            requestAnimationFrame(animasikanCanvas);
+        }
+        animasikanCanvas();
+
+        function buatBintangJatuh(asalX = null, asalY = null) {
+            bintangJatuhArray.push({
+                x: asalX !== null ? asalX : Math.random() * canvas.width,
+                y: asalY !== null ? asalY : Math.random() * (canvas.height * 0.4),
+                vx: (Math.random() * 4 + 6) * (Math.random() < 0.5 ? 1 : -1),
+                vy: Math.random() * 3 + 3,
+                panjangMaks: Math.random() * 250 + 180,
+                jarakTempuh: 0
+            });
+        }
+
+        // Efek Tilt 3D Amplop
+        document.addEventListener('mousemove', (e) => {
+            if (!babakPembuka.classList.contains('tersembunyi')) {
+                const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+                const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+                tiltContainer.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+            }
+        });
+
+        // Tombol Buka Surat
+        btnBukaSurat.addEventListener('click', () => {
+            const val = inputNamaUser.value.trim();
+            if (val) namaPengguna = val;
+            
+            sapaanPersonal.innerText = `✨ UNTUK ${namaPengguna.toUpperCase()} MALAM INI ✨`;
+            
+            babakPembuka.classList.add('tersembunyi');
+            babakMotivasi.classList.remove('tersembunyi');
+            
+            inisialisasiProgresIndikator();
+            muatKartuMotivasi(0);
+        });
+
+        function inisialisasiProgresIndikator() {
+            indikatorProgres.innerHTML = '';
+            for (let i = 0; i < daftarKutipan.length; i++) {
+                const titik = document.createElement('div');
+                titik.classList.add('titik-progres');
+                if (i === 0) titik.classList.add('aktif');
+                indikatorProgres.appendChild(titik);
+            }
+        }
+
+        function perbaruiProgresTitik() {
+            const semuaTitik = indikatorProgres.children;
+            for (let i = 0; i < semuaTitik.length; i++) {
+                semuaTitik[i].className = 'titik-progres';
+                if (i < indeksMotivasi) semuaTitik[i].classList.add('selesai');
+                else if (i === indeksMotivasi) semuaTitik[i].classList.add('aktif');
+            }
+        }
+
+        function muatKartuMotivasi(indeks) {
+            indeksMotivasi = indeks;
+            perbaruiProgresTitik();
+
+            kartuAktif.classList.add('kartu-keluar');
+            setTimeout(() => {
+                nomorKutipan.innerText = `0${indeks + 1} / 0${daftarKutipan.length}`;
+                judulKutipan.innerText = daftarKutipan[indeks].judul;
+                
+                const teksMentah = daftarKutipan[indeks].isi.replace(/{nama}/g, namaPengguna);
+                mulaiEfekKetik(teksMentah);
+
+                fiturLentera.classList.add('tersembunyi');
+                fiturNapas.classList.add('tersembunyi');
+
+                if (daftarKutipan[indeks].jenisFitur === 'lentera') {
+                    fiturLentera.classList.remove('tersembunyi');
+                } else if (daftarKutipan[indeks].jenisFitur === 'napas') {
+                    fiturNapas.classList.remove('tersembunyi');
+                }
+
+                if (indeks === daftarKutipan.length - 1) {
+                    btnLanjutMotivasi.classList.add('tersembunyi');
+                    btnMenujuEnding.classList.remove('tersembunyi');
+                } else {
+                    btnLanjutMotivasi.classList.remove('tersembunyi');
+                    btnMenujuEnding.classList.add('tersembunyi');
+                }
+
+                kartuAktif.classList.remove('kartu-keluar');
+                kartuAktif.classList.add('kartu-masuk');
+                setTimeout(() => kartuAktif.classList.remove('kartu-masuk'), 400);
+            }, 300);
+        }
+
+        function mulaiEfekKetik(teks) {
+            if (timeoutTypewriter) clearTimeout(timeoutTypewriter);
+            isiKutipan.innerText = "";
+            let i = 0;
+            function ketik() {
+                if (i < teks.length) {
+                    isiKutipan.innerText += teks.charAt(i);
+                    i++;
+                    timeoutTypewriter = setTimeout(ketik, 35);
+                }
+            }
+            ketik();
+        }
+
+        btnLanjutMotivasi.addEventListener('click', () => {
+            if (indeksMotivasi < daftarKutipan.length - 1) {
+                muatKartuMotivasi(indeksMotivasi + 1);
+            }
+        });
+
+        // Fitur Lentera Beban
+        btnTerbangkanLentera.addEventListener('click', () => {
+            const beban = inputBeban.value.trim();
+            if (!beban) {
+                statusLentera.innerText = "Tuliskan dulu sebentar apa yang bikin capek...";
+                return;
+            }
+            daftarBebanTerbang.push(beban);
+            
+            // Buat elemen visual lentera naik ke langit
+            const lentera = document.createElement('div');
+            lentera.classList.add('lentera-terbang');
+            lentera.style.left = `${Math.random() * (window.innerWidth - 100) + 50}px`;
+            lentera.innerHTML = `
+                <div class="badan-lentera"></div>
+                <div class="label-lentera">${beban}</div>
+            `;
+            langitLentera.appendChild(lentera);
+            setTimeout(() => lentera.remove(), 18000);
+
+            statusLentera.innerText = "Lenteramu berhasil diterbangkan ke angkasa ✨";
+            inputBeban.value = "";
+            setTimeout(() => { statusLentera.innerText = ""; }, 4000);
+        });
+
+        // Fitur Pernapasan 4-4-4
+        btnMulaiNapas.addEventListener('click', () => {
+            btnMulaiNapas.disabled = true;
+            teksNapas.innerText = "Tarik Napas...";
+            lingkaranNapas.classList.add('tarik');
+
+            setTimeout(() => {
+                teksNapas.innerText = "Tahan...";
+            }, 4000);
+
+            setTimeout(() => {
+                teksNapas.innerText = "Hembuskan...";
+                lingkaranNapas.classList.remove('tarik');
+            }, 8000);
+
+            setTimeout(() => {
+                teksNapas.innerText = "Selesai 🤍";
+                btnMulaiNapas.disabled = false;
+            }, 12000);
+        });
+
+        // Tombol Menuju Babak Ending (Taman Malam)
+        btnMenujuEnding.addEventListener('click', () => {
+            babakMotivasi.classList.add('tersembunyi');
+            babakEnding.classList.remove('tersembunyi');
+            btnUlangSemua.classList.remove('tersembunyi');
+            
+            mulaiMusikEnding();
+            inisialisasiTamanBunga();
+            mulaiSinkronisasiLirik();
+        });
+
+        // Audio Handler
+        function mulaiMusikEnding() {
+            btnAudioToggle.classList.remove('tersembunyi');
+            laguUtama.currentTime = 0;
+            laguUtama.volume = 0.9;
+            
+            laguUtama.play().then(() => {
+                menggunakanMp3 = true;
+                statusAudioTeks.innerText = "Musik Aktif";
+            }).catch(() => {
+                aktifkanPianoFallback();
+            });
+        }
+
+        function aktifkanPianoFallback() {
+            statusAudioTeks.innerText = "Ambient Synth";
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                setInterval(() => {
+                    if (audioCtx.state === 'suspended') return;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    const frekuensi = [261.63, 329.63, 392.00, 523.25][Math.floor(Math.random() * 4)];
+                    osc.frequency.setValueAtTime(frekuensi, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 3);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 3);
+                }, 3000);
+            } catch(e) {}
+        }
+
+        btnAudioToggle.addEventListener('click', () => {
+            if (menggunakanMp3) {
+                if (laguUtama.paused) {
+                    laguUtama.play();
+                    statusAudioTeks.innerText = "Musik Nyala";
+                } else {
+                    laguUtama.pause();
+                    statusAudioTeks.innerText = "Musik Diam";
+                }
+            }
+        });
+
+        // Inisialisasi Rumput & Bunga di Babak 3
+        function inisialisasiTamanBunga() {
+            rumputContainer.innerHTML = '';
+            for (let i = 0; i < window.innerWidth / 12; i++) {
+                const helai = document.createElement('div');
+                helai.classList.add('helai-rumput');
+                helai.style.left = `${i * 12 + Math.random() * 6}px`;
+                helai.style.height = `${Math.random() * 24 + 20}px`;
+                helai.style.animationDuration = `${Math.random() * 2 + 2.5}s`;
+                helai.style.animationDelay = `${Math.random() * 2}s`;
+                rumputContainer.appendChild(helai);
+            }
+        }
+
+        // Sinkronisasi Lirik
+        function mulaiSinkronisasiLirik() {
+            let waktuMulai = Date.now();
+            
+            function perbaruiLirik() {
+                if (babakEnding.classList.contains('tersembunyi')) return;
+                let detikBerjalan = (Date.now() - waktuMulai) / 1000;
+                if (detikBerjalan > 18) {
+                    waktuMulai = Date.now();
+                    detikBerjalan = 0;
+                }
+
+                let lirikAktifObj = jadwalLirikEnding[0];
+                for (let i = 0; i < jadwalLirikEnding.length; i++) {
+                    if (detikBerjalan >= jadwalLirikEnding[i].detik) {
+                        lirikAktifObj = jadwalLirikEnding[i];
+                    }
+                }
+
+                if (teksLirik.innerText !== lirikAktifObj.teks) {
+                    teksLirik.classList.add('lirik-transisi');
+                    setTimeout(() => {
+                        teksLirik.innerText = lirikAktifObj.teks;
+                        teksLirik.classList.remove('lirik-transisi');
+                    }, 350);
+
+                    if (lirikAktifObj.aksiBunga) {
+                        tanamBungaOtomatis();
+                    }
+                }
+
+                requestAnimationFrame(perbaruiLirik);
+            }
+            perbaruiLirik();
+        }
+
+        function tanamBungaOtomatis() {
+            const posX = Math.random() * (window.innerWidth - 100) + 50;
+            buatObjekBunga(posX);
+        }
+
+        function buatObjekBunga(x) {
+            const jenisList = ['jenis-cyan', 'jenis-pink', 'jenis-ungu', 'jenis-emas'];
+            const jenisPilihan = jenisList[Math.floor(Math.random() * jenisList.length)];
+
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('bunga-wrapper', jenisPilihan);
+            wrapper.style.left = `${x}px`;
+            wrapper.style.setProperty('--tinggi-batang', `${Math.random() * 40 + 70}px`);
+            wrapper.style.setProperty('--skala', `${Math.random() * 0.3 + 0.85}`);
+            wrapper.style.setProperty('--durasi-angin', `${Math.random() * 3 + 4}s`);
+            wrapper.style.setProperty('--sudut-awal', `${-Math.random() * 6 - 2}deg`);
+            wrapper.style.setProperty('--sudut-akhir', `${Math.random() * 6 + 2}deg`);
+
+            wrapper.innerHTML = `
+                <div class="batang">
+                    <div class="daun kiri"></div>
+                    <div class="daun kanan"></div>
+                    <div class="mahkota-bunga">
+                        <div class="kelopak"></div>
+                        <div class="kelopak"></div>
+                        <div class="kelopak"></div>
+                        <div class="kelopak"></div>
+                        <div class="kelopak"></div>
+                        <div class="inti-cahaya"></div>
+                    </div>
+                </div>
+            `;
+            tamanBunga.appendChild(wrapper);
+
+            if (tamanBunga.children.length > 50) {
+                tamanBunga.removeChild(tamanBunga.children[0]);
+            }
+        }
+
+        // Interaksi Toolbar Bawah
+        const tombolModeList = document.querySelectorAll('.btn-mode');
+        tombolModeList.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                tombolModeList.forEach(b => b.classList.remove('aktif'));
+                e.target.classList.add('aktif');
+                modeInteraksiEnding = e.target.getAttribute('data-mode');
+            });
+        });
+
+        babakEnding.addEventListener('click', (e) => {
+            if (e.target.closest('.toolbar-interaksi') || e.target.closest('.bulan-purnama')) return;
+
+            const rect = babakEnding.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            if (modeInteraksiEnding === 'bunga' && y > window.innerHeight * 0.5) {
+                buatObjekBunga(x);
+            } else if (modeInteraksiEnding === 'bintang') {
+                buatBintangJatuh(x, y);
+            } else if (modeInteraksiEnding === 'kunang') {
+                buatEfekKunang(x, y);
+            }
+        });
+
+        function buatEfekKunang(x, y) {
+            for (let i = 0; i < 4; i++) {
+                const kunang = document.createElement('div');
+                kunang.style.position = 'absolute';
+                kunang.style.left = `${x}px`;
+                kunang.style.top = `${y}px`;
+                kunang.style.width = '6px';
+                kunang.style.height = '6px';
+                kunang.style.borderRadius = '50%';
+                kunang.style.background = '#fef08a';
+                kunang.style.boxShadow = '0 0 12px #fde047';
+                kunang.style.zIndex = '40';
+                kunang.style.pointerEvents = 'none';
+                kunang.style.transition = 'all 1.8s ease-out';
+
+                babakEnding.appendChild(kunang);
+
+                setTimeout(() => {
+                    kunang.style.transform = `translate(${(Math.random() - 0.5) * 140}px, ${-Math.random() * 120 - 40}px) scale(0.3)`;
+                    kunang.style.opacity = '0';
+                }, 50);
+
+                setTimeout(() => kunang.remove(), 1850);
+            }
+        }
+
+        // Klik Bulan = Hujan Bintang
+        bulanInteraktif.addEventListener('click', () => {
+            for (let i = 0; i < 7; i++) {
+                setTimeout(() => {
+                    buatBintangJatuh(Math.random() * canvas.width, Math.random() * (canvas.height * 0.3));
+                }, i * 200);
+            }
+        });
+
+        // Tombol Ulangi
+        btnUlangSemua.addEventListener('click', () => {
+            location.reload();
+        });
+    </script>
+</body>
+</html>
