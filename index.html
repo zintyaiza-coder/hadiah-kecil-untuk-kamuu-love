@@ -3,50 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Untuk Kamu — Cahaya di Malam Sepi ✨🌙</title>
+    <title>Malam Tenang & Istirahat Sekejap ✨🌙</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Kanvas Partikel Bintang, Kunang-kunang & Ledakan Cahaya -->
+    <!-- Kanvas Partikel Bintang, Kunang-kunang & Salju Cahaya -->
     <canvas id="canvas-semesta"></canvas>
 
-    <!-- Latar Belakang Gradien Malam & Aurora -->
+    <!-- Latar Belakang Malam -->
     <div class="langit-malam"></div>
     <div class="aurora-layer"></div>
 
     <!-- =====================================================================
-         BABAK 1: PROLOG AMPLOP SEGEL LILIN (PEMBUKA - TANPA LAGU)
+         BABAK 1: PROLOG AMPLOP INTERAKTIF (DENGAN ANIMASI HIDUP)
          ===================================================================== -->
     <section id="babak-pembuka" class="layar-babak aktif">
-        <div class="wadah-amplop" id="amplop-interaktif">
+        <div class="wadah-pembuka-animasi">
             <div class="cahaya-belakang-amplop"></div>
-            <div class="amplop-fisik">
+            <div class="kartu-amplop-3d" id="amplop-interaktif">
                 <div class="tutup-amplop"></div>
-                <div class="badan-amplop">
-                    <p class="label-amplop">Sebuah Pesan Kecil Untukmu</p>
-                    <span class="sub-amplop">Ketuk segel lilin untuk membuka</span>
+                <div class="isi-dalam-amplop">
+                    <span class="ikon-surat">💌</span>
+                    <h2>Sebuah Ruang Tenang Untukmu</h2>
+                    <p>Tarik napas, lepaskan lelah, dan mulailah perjalanan kecil ini.</p>
                 </div>
-                <!-- Segel Lilin Interaktif -->
-                <button id="btn-segel-lilin" class="segel-lilin" aria-label="Buka Segel">
-                    <span class="ikon-segel">✦</span>
+                <button id="btn-buka-surat" class="btn-buka-surat">
+                    Buka Amplop ✨
                 </button>
             </div>
         </div>
     </section>
 
     <!-- =====================================================================
-         BABAK 2: 5 KARTU MOTIVASI SEMANGAT (ISI - TANPA LAGU)
+         BABAK 2: 5 KARTU MOTIVASI DINAMIS & PENUH SEMANGAT
          ===================================================================== -->
     <section id="babak-motivasi" class="layar-babak tersembunyi">
         <div class="container-kartu-motivasi">
             <div class="header-motivasi">
-                <span class="badge-babak">✨ PESAN SEMANGAT UNTUKMU ✨</span>
+                <span class="badge-babak">✨ WAKTU UNTUK JEDA SEBENTAR ✨</span>
                 <div class="indikator-progres" id="indikator-progres"></div>
             </div>
 
-            <div class="kartu-kaca" id="kartu-aktif">
+            <div class="kartu-kaca-animasi" id="kartu-aktif">
                 <div class="nomor-kutipan" id="nomor-kutipan">01 / 05</div>
                 <h2 class="judul-kutipan" id="judul-kutipan">Kamu Sudah Berjuang Hebat</h2>
                 <p class="isi-kutipan" id="isi-kutipan">
@@ -57,128 +57,84 @@
 
             <div class="navigasi-motivasi">
                 <button id="btn-lanjut-motivasi" class="btn-utama">
-                    Lanjut Baca ➔
+                    Lanjut Membaca ➔
                 </button>
                 <button id="btn-menuju-ending" class="btn-spesial tersembunyi">
-                    Buka Kejutan Terakhir ✨
+                    Masuk ke Ruang Tenang ✨
                 </button>
             </div>
         </div>
     </section>
 
     <!-- =====================================================================
-         BABAK 3: ENDING TAMAN BUNGA 3D + SILUET AYUNAN + 1 LAGU UTAMA
+         BABAK 3: PEMANDANGAN MALAM (GUNUNG, BULAN, AYUNAN DI SAMPING & BUNGA RENDAH)
          ===================================================================== -->
     <section id="babak-ending" class="layar-babak tersembunyi">
-        <!-- Bulan Purnama Bercahaya -->
+        <!-- Bulan Purnama -->
         <div class="bulan-purnama">
             <div class="kawah-bulan k1"></div>
             <div class="kawah-bulan k2"></div>
         </div>
 
-        <!-- Lirik Sinematik di Ending -->
+        <!-- Siluet Gunung di Latar Belakang -->
+        <div class="pemandangan-gunung">
+            <svg class="svg-gunung" viewBox="0 0 1200 400" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 350 L250 180 L500 280 L800 120 L1200 320 L1200 400 L0 400 Z" fill="#020617" opacity="0.7"/>
+                <path d="M0 380 L150 250 L400 320 L750 190 L1050 310 L1200 260 L1200 400 L0 400 Z" fill="#010409"/>
+            </svg>
+        </div>
+
+        <!-- Lirik Lagu di Bagian Atas -->
         <div id="lirik-container">
             <div class="bingkai-lirik">
                 <span class="bintang-lirik">✦</span>
-                <p id="teks-lirik">Memulai melodi...</p>
+                <p id="teks-lirik">Menikmati malam...</p>
                 <span class="bintang-lirik">✦</span>
             </div>
         </div>
 
-        <!-- Animasi Utama: Pohon Cahaya & Orang Duduk di Ayunan -->
-        <div class="panggung-ayunan">
-            <svg class="svg-pohon-ayunan" viewBox="0 0 600 500" xmlns="http://www.w3.org/2000/svg">
+        <!-- Panggung Ayunan di Samping Kanan/Kiri -->
+        <div class="panggung-ayunan-samping">
+            <svg class="svg-ayunan-samping" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
                 <defs>
-                    <filter id="glow-kuat" x="-30%" y="-30%" width="160%" height="160%">
-                        <feGaussianBlur stdDeviation="6" result="blur" />
+                    <filter id="glow-pohon" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="4" result="blur" />
                         <feComposite in="SourceGraphic" in2="blur" operator="over" />
                     </filter>
-                    <filter id="glow-lembut" x="-20%" y="-20%" width="140%" height="140%">
-                        <feGaussianBlur stdDeviation="3" result="blur" />
-                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                    </filter>
-                    <linearGradient id="grad-batang" x1="0%" y1="100%" x2="0%" y2="0%">
-                        <stop offset="0%" stop-color="#020617" />
-                        <stop offset="60%" stop-color="#0f172a" />
-                        <stop offset="100%" stop-color="#1e293b" />
-                    </linearGradient>
-                    <radialGradient id="grad-daun-pohon" cx="50%" cy="50%" r="50%">
-                        <stop offset="0%" stop-color="#5eead4" stop-opacity="0.35" />
-                        <stop offset="60%" stop-color="#0d9488" stop-opacity="0.15" />
-                        <stop offset="100%" stop-color="#020617" stop-opacity="0" />
-                    </radialGradient>
                 </defs>
+                <!-- Dahan Pohon dari Samping -->
+                <path d="M 0 50 Q 150 40 300 90 Q 380 120 400 140" stroke="#0f172a" stroke-width="22" stroke-linecap="round" fill="none" />
+                <path d="M 0 50 Q 150 40 300 90" stroke="#5eead4" stroke-width="1.2" fill="none" opacity="0.4" filter="url(#glow-pohon)" />
 
-                <!-- Aura Rimbun Pohon di Latar -->
-                <circle cx="320" cy="140" r="160" fill="url(#grad-daun-pohon)" />
-                <circle cx="200" cy="170" r="110" fill="url(#grad-daun-pohon)" />
-                <circle cx="430" cy="165" r="120" fill="url(#grad-daun-pohon)" />
-
-                <!-- Siluet Bukit Kecil Tempat Pohon Tumbuh -->
-                <path d="M 50 500 Q 300 410 550 500 Z" fill="#020617" />
-                <path d="M 50 500 Q 300 410 550 500" stroke="#14b8a6" stroke-width="2" fill="none" opacity="0.5" filter="url(#glow-lembut)" />
-
-                <!-- Batang Utama & Dahan Pohon Besar -->
-                <path d="M 380 460 Q 375 320 350 220 Q 330 150 210 145 Q 150 142 100 165" 
-                      stroke="url(#grad-batang)" stroke-width="26" stroke-linecap="round" fill="none" />
-                <path d="M 355 240 Q 410 170 490 140" 
-                      stroke="url(#grad-batang)" stroke-width="16" stroke-linecap="round" fill="none" />
-                <path d="M 340 200 Q 290 120 260 70" 
-                      stroke="url(#grad-batang)" stroke-width="12" stroke-linecap="round" fill="none" />
-                
-                <!-- Garis Tepi Cahaya Bulan pada Dahan -->
-                <path d="M 350 220 Q 330 150 210 145 Q 150 142 100 165" 
-                      stroke="#5eead4" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6" filter="url(#glow-lembut)" />
-
-                <!-- Ranting-ranting Bercahaya Menggantung -->
-                <g stroke="#5eead4" stroke-width="1.5" opacity="0.55" filter="url(#glow-lembut)">
-                    <path d="M 130 152 Q 125 220 135 280" fill="none" />
-                    <path d="M 160 148 Q 155 210 162 260" fill="none" />
-                    <path d="M 270 148 Q 275 215 268 275" fill="none" />
-                    <path d="M 430 160 Q 435 230 425 290" fill="none" />
-                    <path d="M 465 148 Q 475 210 468 270" fill="none" />
-                </g>
-
-                <!-- Lentera Kecil Menggantung di Ujung Dahan Kiri -->
-                <g class="lentera-gantung">
-                    <line x1="120" y1="156" x2="120" y2="195" stroke="#94a3b8" stroke-width="1.5" />
-                    <rect x="113" y="195" width="14" height="20" rx="4" fill="#fef08a" filter="url(#glow-kuat)" />
-                    <circle cx="120" cy="205" r="18" fill="#fef08a" opacity="0.25" />
-                </g>
-
-                <!-- GRUP AYUNAN & ORANG DUDUK -->
+                <!-- Tali & Ayunan di Samping -->
                 <g class="grup-ayunan">
-                    <line x1="205" y1="145" x2="198" y2="335" stroke="#cbd5e1" stroke-width="2" opacity="0.8" />
-                    <line x1="235" y1="146" x2="242" y2="335" stroke="#cbd5e1" stroke-width="2" opacity="0.8" />
+                    <line x1="220" y1="70" x2="215" y2="240" stroke="#94a3b8" stroke-width="1.8" opacity="0.8" />
+                    <line x1="248" y1="80" x2="243" y2="240" stroke="#94a3b8" stroke-width="1.8" opacity="0.8" />
+                    <rect x="208" y="240" width="45" height="5" rx="2.5" fill="#5eead4" filter="url(#glow-pohon)" />
 
-                    <rect x="190" y="335" width="60" height="6" rx="3" fill="#5eead4" filter="url(#glow-lembut)" />
-
-                    <!-- Siluet Orang Duduk -->
-                    <path d="M 225 335 L 245 365 L 240 388" stroke="#020617" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-                    <path d="M 218 335 L 236 368 L 230 390" stroke="#0f172a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-                    <path d="M 215 335 Q 208 305 216 285 Q 225 285 228 335 Z" fill="#020617" />
-                    <path d="M 215 335 Q 208 305 216 285" stroke="#5eead4" stroke-width="1.5" fill="none" opacity="0.8" />
-                    <path d="M 216 298 L 238 302" stroke="#020617" stroke-width="6" stroke-linecap="round" />
-                    <circle cx="221" cy="272" r="11" fill="#020617" />
-                    <path d="M 212 268 Q 198 275 192 288 Q 205 285 214 278 Z" fill="#020617" />
-                    <path d="M 212 268 Q 198 275 192 288" stroke="#f472b6" stroke-width="1.2" fill="none" opacity="0.85" />
+                    <!-- Siluet Orang Duduk Menghadap Tenang -->
+                    <path d="M 235 240 L 250 265 L 245 285" stroke="#020617" stroke-width="7" stroke-linecap="round" fill="none" />
+                    <path d="M 228 240 L 242 268 L 238 288" stroke="#0f172a" stroke-width="6" stroke-linecap="round" fill="none" />
+                    <path d="M 225 240 Q 218 215 224 195 Q 232 195 236 240 Z" fill="#020617" />
+                    <circle cx="229" cy="184" r="9.5" fill="#020617" />
+                    <path d="M 221 180 Q 212 185 208 195 Q 215 194 222 188 Z" fill="#f472b6" opacity="0.8" />
                 </g>
             </svg>
         </div>
 
-        <!-- Wadah Taman Bunga 3D Neon -->
+        <!-- Wadah Taman Bunga Rendah (Supaya Pemandangan Tetap Terlihat) -->
         <div id="taman-bunga"></div>
         <div id="rumput-container"></div>
 
-        <!-- Petunjuk Interaksi Ending -->
-        <div id="petunjuk-ending">Sentuh layar di mana saja untuk menumbuhkan bunga cahaya baru ✨</div>
+        <!-- Petunjuk Interaksi -->
+        <div id="petunjuk-ending">Sentuh layar di mana saja untuk menumbuhkan bunga cahaya & kunang-kunang ✨</div>
         
-        <!-- Tombol Ulangi dari Awal -->
-        <button id="btn-ulang-semua" class="btn-ulang-pojok">Ulangi Cerita ↻</button>
+        <!-- Tombol Ulangi -->
+        <button id="btn-ulang-semua" class="btn-ulang-pojok">Ulangi dari Awal ↻</button>
     </section>
 
-    <!-- 1 File Audio Saja (Khusus Ending) -->
-    <audio id="lagu-ending" src="lagu.mp3" loop></audio>
+    <!-- 1 File Audio Utama -->
+    <audio id="lagu-utama" src="lagu.mp3" loop></audio>
 
     <script src="script.js"></script>
 </body>
