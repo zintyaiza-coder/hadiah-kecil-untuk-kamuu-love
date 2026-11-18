@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sanctuary Malam — Ruang Jeda & Bintang ✨🌙</title>
+    <title>Sanctuary Malam — Ramai Sepi Bersama ✨🌙</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Kanvas Utama: Bintang, Bintang Jatuh, Rasi Bintang & Kunang-kunang -->
+    <!-- Kanvas Utama: Bintang, Bintang Jatuh & Rasi Bintang -->
     <canvas id="canvas-semesta"></canvas>
 
     <!-- Lapisan Atmosfer Langit & Aurora -->
@@ -17,13 +17,13 @@
     <div class="aurora-layer"></div>
     <div class="kabut-malam"></div>
 
-    <!-- Kontrol Audio Mengambang -->
-    <button id="btn-audio-toggle" class="btn-kontrol-mengambang tersembunyi" title="Suara Ambient">
-        🔊 <span id="status-audio-teks">Musik Lembut</span>
+    <!-- Tombol Kontrol Musik Mengambang di Pojok Kiri Atas -->
+    <button id="btn-audio-toggle" class="btn-kontrol-mengambang tersembunyi" title="Kontrol Musik">
+        🔊 <span id="status-audio-teks">Musik Menyala</span>
     </button>
 
     <!-- =====================================================================
-         BABAK 1: PROLOG AMPLOP 3D TILT & PERSONALISASI NAMA
+         BABAK 1: PROLOG AMPLOP 3D TILT & INPUT NAMA PENGGUNA
          ===================================================================== -->
     <section id="babak-pembuka" class="layar-babak aktif">
         <div class="wadah-pembuka-animasi" id="tilt-container">
@@ -46,7 +46,7 @@
     </section>
 
     <!-- =====================================================================
-         BABAK 2: 5 KARTU MOTIVASI + FITUR LENTERA & NAPAS INTERAKTIF
+         BABAK 2: 5 KARTU MOTIVASI DENGAN EFEK KETIK & FITUR INTERAKTIF
          ===================================================================== -->
     <section id="babak-motivasi" class="layar-babak tersembunyi">
         <div class="container-kartu-motivasi">
@@ -55,7 +55,7 @@
                 <div class="indikator-progres" id="indikator-progres"></div>
             </div>
 
-            <!-- Kartu Utama -->
+            <!-- Kartu Konten Utama -->
             <div class="kartu-kaca-animasi" id="kartu-aktif">
                 <div class="nomor-kutipan" id="nomor-kutipan">01 / 05</div>
                 <h2 class="judul-kutipan" id="judul-kutipan">Kamu Sudah Berjuang Hebat</h2>
@@ -64,14 +64,14 @@
                     <p class="isi-kutipan" id="isi-kutipan"></p>
                 </div>
 
-                <!-- Fitur 1: Lentera Pelepasan Beban (Muncul di langkah ke-4) -->
+                <!-- Fitur Interaktif 1: Lentera Pelepasan Beban -->
                 <div id="fitur-lentera" class="area-interaktif-kartu tersembunyi">
                     <input type="text" id="input-beban" placeholder="Tulis satu hal yang bikin capek hari ini..." maxlength="60">
                     <button id="btn-terbangkan-lentera" class="btn-sekunder">Terbangkan Jadi Lentera 🏮</button>
                     <p id="status-lentera" class="teks-petunjuk-kecil"></p>
                 </div>
 
-                <!-- Fitur 2: Pemandu Napas 4-4-4 (Muncul di langkah ke-2) -->
+                <!-- Fitur Interaktif 2: Pemandu Napas 4-4-4 -->
                 <div id="fitur-napas" class="area-interaktif-kartu tersembunyi">
                     <div class="wadah-lingkaran-napas">
                         <div class="lingkaran-napas" id="lingkaran-napas">
@@ -96,7 +96,7 @@
     </section>
 
     <!-- =====================================================================
-         BABAK 3: TAMAN MALAM, DANAU REFLEKSI & MODE INTERAKSI
+         BABAK 3: TAMAN MALAM, MUSIK UTAMA & LIRIK SINKRON
          ===================================================================== -->
     <section id="babak-ending" class="layar-babak tersembunyi">
         <!-- Bulan Purnama Interaktif -->
@@ -106,7 +106,7 @@
             <div class="kawah-bulan k3"></div>
         </div>
 
-        <!-- Lentera Pelepasan Beban yang Melayang ke Langit -->
+        <!-- Wadah Lentera Beban yang Melayang ke Langit -->
         <div id="langit-lentera"></div>
 
         <!-- Siluet Gunung Berlapis -->
@@ -117,11 +117,11 @@
             </svg>
         </div>
 
-        <!-- Bingkai Pesan Puitis di Atas -->
+        <!-- Wadah Lirik Lagu Sinkron di Bagian Atas -->
         <div id="lirik-container">
             <div class="bingkai-lirik">
                 <span class="bintang-lirik">✦</span>
-                <p id="teks-lirik">Selamat datang di ruang tenangmu...</p>
+                <p id="teks-lirik">Menikmati malam...</p>
                 <span class="bintang-lirik">✦</span>
             </div>
         </div>
@@ -146,39 +146,4 @@
                 <g class="grup-ayunan">
                     <line x1="220" y1="72" x2="215" y2="245" stroke="#94a3b8" stroke-width="1.8" opacity="0.85" />
                     <line x1="250" y1="82" x2="245" y2="245" stroke="#94a3b8" stroke-width="1.8" opacity="0.85" />
-                    <rect x="208" y="245" width="48" height="6" rx="3" fill="#5eead4" filter="url(#glow-pohon)" />
-
-                    <path d="M 236 245 L 252 270 L 247 290" stroke="#020617" stroke-width="7" stroke-linecap="round" fill="none" />
-                    <path d="M 229 245 L 243 273 L 239 293" stroke="#0f172a" stroke-width="6" stroke-linecap="round" fill="none" />
-                    <path d="M 225 245 Q 218 218 224 196 Q 233 196 237 245 Z" fill="#020617" />
-                    <circle cx="230" cy="184" r="10" fill="#020617" />
-                    <path d="M 221 180 Q 210 186 205 198 Q 214 196 222 189 Z" fill="#f472b6" opacity="0.9" />
-                </g>
-            </svg>
-        </div>
-
-        <!-- Danau Refleksi di Bawah -->
-        <div class="danau-refleksi">
-            <div class="pantulan-bulan"></div>
-        </div>
-
-        <!-- Taman Bunga Neon & Rumput -->
-        <div id="taman-bunga"></div>
-        <div id="rumput-container"></div>
-
-        <!-- Toolbar Mode Interaksi di Babak 3 -->
-        <div class="toolbar-interaksi">
-            <button class="btn-mode aktif" data-mode="bunga">🌸 Tanam Bunga</button>
-            <button class="btn-mode" data-mode="bintang">✨ Gambar Rasi Bintang</button>
-            <button class="btn-mode" data-mode="lentera">🏮 Lepas Lentera</button>
-        </div>
-
-        <button id="btn-ulang-semua" class="btn-ulang-pojok">Ulangi ↻</button>
-    </section>
-
-    <!-- Audio Utama (Jika file lagu.mp3 ada, diputar; jika tidak, Synth Piano aktif otomatis) -->
-    <audio id="lagu-utama" src="lagu.mp3" loop></audio>
-
-    <script src="script.js"></script>
-</body>
-</html>
+                    <rect x="208" y="245
